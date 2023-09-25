@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -30,7 +31,9 @@ import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentProf
 import com.example.bait2073mobileapplicationdevelopment.entities.User
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserForm.UserFormFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserForm.UserFormViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.fragment.MainFragmentViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.profile.Gender.RequestGenderViewModel
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.squareup.picasso.Picasso
@@ -43,7 +46,7 @@ class ProfileFragment : Fragment() {
     private lateinit var dialog: Dialog
     private lateinit var binding: FragmentProfileBinding
     private lateinit var viewModel: ProfileFragmentViewModel
-
+    private lateinit var sharedViewModel: MainFragmentViewModel
     private lateinit var user: User
     private val PICK_IMAGE_REQUEST = 1
     private val CAPTURE_IMAGE_REQUEST = 2
@@ -57,7 +60,7 @@ class ProfileFragment : Fragment() {
 
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
-
+        sharedViewModel = ViewModelProvider(requireActivity()).get(MainFragmentViewModel::class.java)
 
 
         validateOnChangeUserName()
@@ -93,7 +96,8 @@ class ProfileFragment : Fragment() {
     }
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
+        intent.type = "image/*"  // Set the MIME type to images only
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/jpg", "image/png"))
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
@@ -162,6 +166,8 @@ class ProfileFragment : Fragment() {
             user.rating
         )
 
+
+
             viewModel.updateUser(user_id ?: 0, user)
 
     }
@@ -205,12 +211,20 @@ class ProfileFragment : Fragment() {
                 binding.layoutEmail.error = "Email Already Registered, Please Try Another Email"
             } else {
 
-
+//                val navView = binding.root.findViewById<NavigationView>(R.id.nav_view)
+//                val navImage = navView.findViewById<ImageView>(R.id.navImage)
+//
+//
+//                if (!it.image.isNullOrBlank()) {
+//
+//                    Picasso.get().load(it.image).into(navImage)
+//
+//                }
                 val userData = retrieveUserDataFromSharedPreferences(requireContext())
                 val userId = userData?.first
                 loadUserData(userId)
 
-
+                sharedViewModel.getUserData(userId)
 
                 //save back the newest share preferences
                 saveUserDataToSharedPreferences(requireContext(), it.id ?: 0, it.name)
@@ -230,10 +244,8 @@ class ProfileFragment : Fragment() {
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(ProfileFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(this, ProfileFragmentViewModelFactory())
+            .get(ProfileFragmentViewModel::class.java)
 
     }
     private fun encodeBitmapToBase64(bitmap: Bitmap): String? {

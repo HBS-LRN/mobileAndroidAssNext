@@ -1,0 +1,4 @@
+package com.example.bait2073mobileapplicationdevelopment.screens.dashboard.AdminDashboard
+
+class AdminDashboardViewModelFactory {
+}
