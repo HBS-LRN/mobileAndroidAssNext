@@ -97,14 +97,16 @@ class AdminListFragment : Fragment(), UserAdapter.UserClickListener,
     }
 
     fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            AdminListViewModel::class.java
-        )
+//        viewModel = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(
+//            AdminListViewModel::class.java
+//        )
 
 
+        // Initialize your ViewModel using the custom factory
+        viewModel = ViewModelProvider(this, AdminListViewModelFactory()).get(AdminListViewModel::class.java)
         viewModel.getUserListObserverable()
             .observe(viewLifecycleOwner, Observer<List<User?>> { userListResponse ->
                 if (userListResponse == null) {
