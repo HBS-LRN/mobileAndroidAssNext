@@ -94,10 +94,8 @@ class RequestEmailActivity  : AppCompatActivity() {
 
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        ).get(RequestEmailViewModel::class.java)
+        viewModel = ViewModelProvider(this, RequestEmailViewModelFactory())
+            .get(RequestEmailViewModel::class.java)
 
 
     }

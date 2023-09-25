@@ -137,10 +137,8 @@ class RequestBmiActivity : AppCompatActivity(){
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        ).get(RequestBmiActivityViewModel::class.java)
+        viewModel = ViewModelProvider(this, RequestBmiActivityViewModelFactory())
+            .get(RequestBmiActivityViewModel::class.java)
 
 
     }

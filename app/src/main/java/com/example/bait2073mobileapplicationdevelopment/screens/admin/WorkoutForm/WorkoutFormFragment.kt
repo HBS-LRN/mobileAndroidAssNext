@@ -160,7 +160,7 @@ class WorkoutFormFragment : Fragment() {
 
     private fun validateLink(): Boolean {
         val link = binding.eTextLink.text.toString().trim()
-        return if (!link.isEmpty()) {
+        return if (link.isEmpty()) {
             binding.layoutLink.error = "Link cannot be empty"
             false
         } else {

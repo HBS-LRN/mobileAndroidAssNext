@@ -12,7 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.example.bait2073mobileapplicationdevelopment.screens.auth.Login.LoginActivity
-import com.example.bait2073mobileapplicationdevelopment.interfaces.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetUserDataService
 import com.example.bait2073mobileapplicationdevelopment.entities.User
 import com.example.bait2073mobileapplicationdevelopment.viewmodel.UserViewModel

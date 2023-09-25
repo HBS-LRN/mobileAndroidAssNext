@@ -153,6 +153,8 @@ class MainFragment : AppCompatActivity(){
 
         loadUserData(userId)
 
+
+
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -164,6 +166,9 @@ class MainFragment : AppCompatActivity(){
 //            item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
 //        }
 //    }
+
+
+
 
 
     private fun loadUserData(user_id: Int?) {

@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.BaseActivity
-import com.example.bait2073mobileapplicationdevelopment.interfaces.database.EventDatabase
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventDataService

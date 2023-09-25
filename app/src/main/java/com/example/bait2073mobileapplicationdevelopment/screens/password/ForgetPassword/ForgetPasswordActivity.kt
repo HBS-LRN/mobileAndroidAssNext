@@ -86,11 +86,8 @@ class ForgetPasswordActivity : AppCompatActivity() {
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        ).get(ForgetPasswordViewModel::class.java)
-
+        viewModel = ViewModelProvider(this, ForgetPasswordViewModelFactory())
+            .get(ForgetPasswordViewModel::class.java)
     }
     private fun updatePasswordObservable() {
         viewModel.getUpdatePasswordObservable()

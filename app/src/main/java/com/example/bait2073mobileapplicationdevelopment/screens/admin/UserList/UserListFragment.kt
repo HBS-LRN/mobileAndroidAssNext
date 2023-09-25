@@ -25,6 +25,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentUserListBinding
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserForm.UserFormViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserForm.UserFormViewModelFactory
 
 
 class UserListFragment: Fragment(), UserAdapter.UserClickListener, PopupMenu.OnMenuItemClickListener {
@@ -34,7 +36,7 @@ class UserListFragment: Fragment(), UserAdapter.UserClickListener, PopupMenu.OnM
     private lateinit var binding:FragmentUserListBinding
     lateinit var selectedUser : User
     private lateinit var dialog: Dialog
-
+    private lateinit var viewModelFactory: UserListViewModelFactory
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,11 +93,20 @@ class UserListFragment: Fragment(), UserAdapter.UserClickListener, PopupMenu.OnM
     }
 
     fun initViewModel() {
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            UserListViewModel::class.java)
 
 
+        viewModelFactory = UserListViewModelFactory()
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(UserListViewModel::class.java)
+
+
+
+
+
+
+        // Initialize your ViewModel using the custom factory
+        //another initialize method
+//        viewModel = ViewModelProvider(this, UserListViewModelFactory()).get(UserListViewModel::class.java)
         viewModel.getUserListObserverable().observe(viewLifecycleOwner, Observer<List<User?>> {userListResponse ->
             if(userListResponse == null) {
                 Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG).show()
@@ -157,7 +168,7 @@ class UserListFragment: Fragment(), UserAdapter.UserClickListener, PopupMenu.OnM
             if (deletedUser == null) {
                 Toast.makeText(requireContext(), "Cannot Delete User", Toast.LENGTH_SHORT).show()
             } else {
-                showSuccessDialog()
+                Toast.makeText(requireContext(), "Successfully Deleted User", Toast.LENGTH_SHORT).show()
                 viewModel.getUsers()
 
                 // You can perform any other actions needed after successful deletion here

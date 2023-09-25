@@ -115,7 +115,7 @@ class DiseaseHospitalAdapter (private val context : Context) : RecyclerView.Adap
 //            }
             try {
                 val escapedQuery = URLEncoder.encode(hospitalAddress, "UTF-8")
-                val uri = Uri.parse("http://www.google.com/maps?#q=$escapedQuery")
+                val uri = Uri.parse("http://www.google.com/search?q=$escapedQuery")
                 val intent = Intent(Intent.ACTION_VIEW, uri)
                 context.startActivity(intent)
             } catch (e: UnsupportedEncodingException) {

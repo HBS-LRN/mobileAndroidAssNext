@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -79,14 +80,15 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
                             recipeServings = recipe.recipe_servings!!
                             val recipeImage = recipe.recipe_image
                             if (recipeImage.isNullOrBlank()) {
+                                Log.e("noimage", "noimage")
+                                Picasso.get().load(R.drawable.diseases_recipe)
+                                    .into(holder.recipeImage)
+                            } else {
                                 Glide.with(ctx!!)
                                     .load(recipeImage)
                                     .fitCenter()
                                     .into(holder.recipeImage)
-                            } else {
-                                Log.e("noimage", "noimage")
-                                Picasso.get().load(R.drawable.diseases_recipe)
-                                    .into(holder.recipeImage)
+
                             }
                             holder.recipeName.text = recipeName
                         } else {
@@ -108,13 +110,14 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
                 currentPopupWindow?.dismiss()
 
                 //create a popup window
+                //create a popup window
                 val inflater =
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val popupView = inflater.inflate(R.layout.fragment_popup_recipe, null)
                 val popupWindow = PopupWindow(
                     popupView,
-                    600,
-                    600
+                    WindowManager.LayoutParams.WRAP_CONTENT, // Width
+                    WindowManager.LayoutParams.WRAP_CONTENT
                 )
                 // Set the content of the popup
                 val popupDescription = popupView.findViewById<TextView>(R.id.popupRecipeDescription)
@@ -128,6 +131,10 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
                 currentPopupWindow = popupWindow
                 popupWindow.isTouchable = true
                 popupWindow.isOutsideTouchable = true
+                popupWindow.setOnDismissListener {
+                    currentPopupWindow = null
+                }
+
                 popupView.setOnTouchListener { _, event ->
                     if (event.action == MotionEvent.ACTION_DOWN) {
                         popupWindow.dismiss()
@@ -136,8 +143,8 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
                         false
                     }
                 }
-            }
 
+            }
         }
 
         override fun getItemCount(): Int {

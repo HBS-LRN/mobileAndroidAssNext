@@ -42,6 +42,7 @@ class UserFormFragment : Fragment() {
     private val CAPTURE_IMAGE_REQUEST = 2
     private var selectedImageBitmap: Bitmap? = null
     private lateinit var dialog: Dialog
+    private lateinit var viewModelFactory: UserFormViewModelFactory
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,26 +84,14 @@ class UserFormFragment : Fragment() {
 
 
     // Function to show a dialog for choosing between gallery and camera
-
+    // User Can Only update jpeg, jpg or png
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
+        intent.type = "image/*"  // Set the MIME type to images only
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/jpg", "image/png"))
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
-    // Function to open the camera for image capture
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (resultCode == Activity.RESULT_OK) {
-//
-//                if(requestCode == 101){
-//                    val url = data?.data
-//                    binding.profileImg.setImageURI(url)
-//                }
-//            }
-//        }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -204,10 +193,10 @@ class UserFormFragment : Fragment() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(UserFormViewModel::class.java)
+
+        viewModelFactory = UserFormViewModelFactory()
+        viewModel = ViewModelProvider(this, viewModelFactory).get(UserFormViewModel::class.java)
+
 
     }
 

@@ -19,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -396,16 +397,38 @@ class ManageEventFragment : Fragment() {
         val title = editTextTitle.text.toString()
             .trim { it <= ' ' }
 
+        val editTextDesc: EditText = binding.eTextDetails
+        val desc = editTextDesc.text.toString()
+            .trim { it <= ' ' }
+
+        val editTextAddress: EditText = binding.eTextAddress
+        val add = editTextAddress.text.toString()
+            .trim { it <= ' ' }
 
         if (title.isEmpty()) {
             binding.layoutTitle.error = "Title cannot be empty"
-            binding.layoutAddress.error = "Address cannot be empty"
-            binding.layoutDetails.error = "Details cannot be empty"
-
             return false
-        } else {
-            return true
+        } else{
+            binding.layoutTitle.error = null
         }
+
+         if(desc.isEmpty()) {
+             binding.layoutDetails.error = "Details cannot be empty"
+             return false
+         }else{
+             binding.layoutDetails.error = null
+         }
+
+
+        if (add.isEmpty()){
+            binding.layoutAddress.error = "Address cannot be empty"
+            return false
+        }else{
+            binding.layoutAddress.error = null
+        }
+
+            return true
+
 
     }
 

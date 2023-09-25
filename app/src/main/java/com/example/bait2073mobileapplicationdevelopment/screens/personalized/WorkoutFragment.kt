@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.personalized
 
+import WorkoutFragmentViewModelFactory
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -86,12 +87,9 @@ class WorkoutFragment : Fragment(), PersonalizedWorkOutAdapter.WorkoutClickListe
     }
 
     fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            WorkoutFragmentViewModel::class.java
-        )
+
+        viewModel = ViewModelProvider(this, WorkoutFragmentViewModelFactory())
+            .get(WorkoutFragmentViewModel::class.java)
 
 
         viewModel.getWorkoutListObserverable()

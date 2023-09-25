@@ -90,7 +90,7 @@
             android:background="#00000000"
             android:iconifiedByDefault="false"
             android:queryBackground="@color/transparent"
-            android:queryHint="Search Customers"
+            android:queryHint="Search User"
 
             />
 

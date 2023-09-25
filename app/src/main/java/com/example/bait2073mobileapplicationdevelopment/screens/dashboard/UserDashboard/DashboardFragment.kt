@@ -107,13 +107,8 @@ class DashboardFragment : Fragment() {
 
 
     private fun initUserViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            DashboardViewModel::class.java
-        )
-
+        viewModel = ViewModelProvider(this, DashboardViewModelFactory())
+            .get(DashboardViewModel::class.java)
 
     }
 

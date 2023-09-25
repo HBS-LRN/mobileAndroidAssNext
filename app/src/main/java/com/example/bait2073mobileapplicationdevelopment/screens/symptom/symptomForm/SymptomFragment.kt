@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.bait2073mobileapplicationdevelopment.adapter.SymptomListAdapter
-import com.example.bait2073mobileapplicationdevelopment.interfaces.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentSymptomListBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.viewmodel.SymptomViewModel

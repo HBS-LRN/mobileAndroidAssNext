@@ -16,11 +16,12 @@ class MainFragmentViewModel : ViewModel() {
     lateinit var loadUserData: MutableLiveData<User?>
 
 
-
     init {
         loadUserData = MutableLiveData()
 
     }
+
+
 
 
 

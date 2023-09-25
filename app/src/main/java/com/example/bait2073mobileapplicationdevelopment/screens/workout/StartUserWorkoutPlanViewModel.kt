@@ -12,7 +12,6 @@ class StartUserWorkoutPlanViewModel : ViewModel() {
     // The current word
     // The current word
 
-
     private val workoutList = ArrayList<UserPlanList>()
 
 
@@ -163,12 +162,14 @@ class StartUserWorkoutPlanViewModel : ViewModel() {
 
     /** Methods for buttons presses **/
     fun onSkip() {
-
         nextActivity()
+        // Increment activityCount based on the available workout size
+        _activityCount.value = (activityCount.value)?.plus(1)
 
-        if (_activityCount.value != 5)
-            _activityCount.value = (activityCount.value)?.plus(1)
-
+        // Check if all activities are completed
+        if (activityCount.value == workoutList.size) {
+            onActivityFinish()
+        }
     }
 
 

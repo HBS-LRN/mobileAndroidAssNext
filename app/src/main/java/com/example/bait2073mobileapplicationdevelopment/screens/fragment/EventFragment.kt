@@ -129,8 +129,8 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
             }else{
                 val eventList = eventListResponse.filterNotNull().toMutableList()
                 Log.i("EventListFragment","initViewModel:\n"+"$eventList")
-                    recyclerViewAdapter.updateList(eventList)
-                    recyclerViewAdapter.notifyDataSetChanged()
+                recyclerViewAdapter.updateList(eventList)
+                recyclerViewAdapter.notifyDataSetChanged()
 
 
             }

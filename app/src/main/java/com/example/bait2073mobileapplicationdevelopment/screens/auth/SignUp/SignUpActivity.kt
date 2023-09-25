@@ -85,10 +85,8 @@ class SignUpActivity : AppCompatActivity() {
         })
     }
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        ).get(SignUpViewModel::class.java)
+        viewModel = ViewModelProvider(this, SignUpViewModelFactory())
+            .get(SignUpViewModel::class.java)
 
 
     }

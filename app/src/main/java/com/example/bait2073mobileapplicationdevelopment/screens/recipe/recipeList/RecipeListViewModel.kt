@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bait2073mobileapplicationdevelopment.entities.Recipe
 import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetRecipeDataService
-import com.example.bait2073mobileapplicationdevelopment.interfaces.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.repository.RecipeRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
 import kotlinx.coroutines.Dispatchers

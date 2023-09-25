@@ -190,7 +190,7 @@ class AdminListFragment : Fragment(), UserAdapter.UserClickListener,
                     Toast.makeText(requireContext(), "Cannot Delete User", Toast.LENGTH_SHORT)
                         .show()
                 } else {
-                    showSuccessDialog()
+                    Toast.makeText(requireContext(), "Successfully Deleted User", Toast.LENGTH_SHORT).show()
                     viewModel.getUsers()
 
                     // You can perform any other actions needed after successful deletion here

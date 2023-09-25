@@ -7,10 +7,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "Disease_Recipe", foreignKeys = [
-    ForeignKey(entity = Disease::class, parentColumns = ["id"], childColumns = ["disease_id"], onDelete = ForeignKey.CASCADE),
-    ForeignKey(entity = Recipe::class, parentColumns = ["id"], childColumns = ["recipe_id"], onDelete = ForeignKey.CASCADE)
-])
+@Entity(tableName = "Disease_Recipe")
 
 data class Disease_Recipe (
     @PrimaryKey

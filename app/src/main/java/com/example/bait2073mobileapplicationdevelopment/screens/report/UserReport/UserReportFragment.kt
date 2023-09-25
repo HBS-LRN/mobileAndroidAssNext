@@ -54,12 +54,8 @@ class UserReportFragment : Fragment(), CalendarAdapter.OnItemListener {
             false
         )
 
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            UserReportViewModel::class.java
-        )
+        viewModel = ViewModelProvider(this, UserReportViewModelFactory())
+            .get(UserReportViewModel::class.java)
 
 
         val userData = retrieveUserDataFromSharedPreferences(requireContext())

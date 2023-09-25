@@ -82,9 +82,8 @@ class ReportDashboardFragment  : Fragment() {
         return null
     }
     private fun initUserViewModel() {
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            AdminDashboardViewModel::class.java)
+        viewModel = ViewModelProvider(this, AdminDashboardViewModelFactory())
+            .get(AdminDashboardViewModel::class.java)
 
         viewModel.getUserListObserverable().observe(viewLifecycleOwner, Observer<List<User?>> {userListResponse ->
             if(userListResponse == null) {

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.bait2073mobileapplicationdevelopment.adapter.DiseaseRecipeListAdapter
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentDiseaserecipeListBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
-import com.example.bait2073mobileapplicationdevelopment.interfaces.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.viewmodel.DiseaseViewModel
 
 class DiseaseRecipeFragment : Fragment(), DiseaseRecipeListAdapter.DiseaseRecipeClickListener, PopupMenu.OnMenuItemClickListener {

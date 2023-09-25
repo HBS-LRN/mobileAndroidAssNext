@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -95,7 +96,8 @@ class AdminFormFragment : Fragment() {
     }
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
+        intent.type = "image/*"  // Set the MIME type to images only
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/jpg", "image/png"))
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
@@ -175,6 +177,8 @@ class AdminFormFragment : Fragment() {
     private fun createUser(user_id: Int?,selectedImageBitmap: Bitmap?) {
 
 
+
+
         val imageData: String? = if (selectedImageBitmap != null) {
             encodeBitmapToBase64(selectedImageBitmap)
         } else {
@@ -206,6 +210,11 @@ class AdminFormFragment : Fragment() {
 
     }
 
+    private fun isImageFile(uri: Uri): Boolean {
+        val mimeType = requireContext().contentResolver.getType(uri)
+        return mimeType?.startsWith("image/") == true
+    }
+
 
     private fun encodeBitmapToBase64(bitmap: Bitmap): String? {
         val baos = ByteArrayOutputStream()
@@ -214,11 +223,14 @@ class AdminFormFragment : Fragment() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
     private fun initViewModel() {
+//        viewModel = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(AdminFormViewModel::class.java)
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            AdminFormViewModelFactory()
         ).get(AdminFormViewModel::class.java)
-
     }
 
     private fun createUserObservable() {

@@ -106,10 +106,8 @@ class RequestGenderActivity : AppCompatActivity() {
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
-        ).get(RequestGenderViewModel::class.java)
+        viewModel = ViewModelProvider(this, RequestGenderViewModelFactory())
+            .get(RequestGenderViewModel::class.java)
 
 
     }

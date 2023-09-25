@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.personalized
 
+import StartPersonalizedViewModelFactory
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
@@ -54,11 +55,15 @@ class StartPersonalizedFragment : Fragment() {
 //        val factory = StartPersonalizedViewModelFactory()
 //        viewModel = ViewModelProvider(this, factory).get(StartPersonalizedViewModel::class.java)
         Log.i("GameFragment", "Called ViewModelProvider.get")
-        viewModel = ViewModelProvider(this).get(StartPersonalizedViewModel::class.java)
+//        viewModel = ViewModelProvider(this).get(StartPersonalizedViewModel::class.java)
 //        viewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
 //            binding.scoreText.text = newScore.toString()
 //
 //        })
+
+        viewModel = ViewModelProvider(this, StartPersonalizedViewModelFactory())
+            .get(StartPersonalizedViewModel::class.java)
+
 
 
         viewModelRoom = ViewModelProvider(

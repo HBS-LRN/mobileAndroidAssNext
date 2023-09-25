@@ -154,10 +154,8 @@ class ChangePasswordFragment : Fragment() {
 
 
     private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(ChangePasswordViewModel::class.java)
+        viewModel = ViewModelProvider(this, ChangePasswordViewModelFactory())
+            .get(ChangePasswordViewModel::class.java)
 
     }
 

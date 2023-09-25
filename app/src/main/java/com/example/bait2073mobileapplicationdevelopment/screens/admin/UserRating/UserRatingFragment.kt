@@ -27,6 +27,7 @@ import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.adapter.UserRatingAdapter
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentRatingListBinding
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentUserListBinding
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserRating.UserRatingViewModelFactory
 
 
 class UserRatingFragment : Fragment(), UserRatingAdapter.UserClickListener{
@@ -81,9 +82,16 @@ class UserRatingFragment : Fragment(), UserRatingAdapter.UserClickListener{
     }
 
     fun initViewModel() {
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            UserRatingViewModel::class.java)
+//        viewModel = ViewModelProvider(this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
+//            UserRatingViewModel::class.java)
+
+
+
+        viewModel = ViewModelProvider(
+            this,
+            UserRatingViewModelFactory()
+        ).get(UserRatingViewModel::class.java)
 
 
         viewModel.getUserListObserverable().observe(viewLifecycleOwner, Observer<List<User?>> {userListResponse ->

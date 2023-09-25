@@ -74,13 +74,13 @@ class DiseaseResultAdapter(private val context : Context) :  RecyclerView.Adapte
                         val diseaseName = disease.disease_name
                         val diseaseImage = disease.disease_image
                         if (diseaseImage.isNullOrBlank()) {
+                            Log.e("noimage", "noimage")
+                            Picasso.get().load(R.drawable.image_disease)
+                                .into(holder.diseaseImageView)
+                        } else {
                             Glide.with(ctx!!)
                                 .load(diseaseImage)
                                 .fitCenter()
-                                .into(holder.diseaseImageView)
-                        } else {
-                            Log.e("noimage", "noimage")
-                            Picasso.get().load(R.drawable.diseases_recipe)
                                 .into(holder.diseaseImageView)
                         }
                         holder.diseaseName.text = diseaseName

@@ -70,7 +70,6 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
         var symptomDescription : String = ""
         Log.i("diseasesymptomlist", "$diseaseSymptomList")
 
-
         apiService2.getSymptom(symptomId).enqueue(object : Callback<Symptom> {
             override fun onResponse(call: Call<Symptom>, response: Response<Symptom>) {
                 if (response.isSuccessful) {
@@ -82,14 +81,14 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
                         symptomDescription = symptom.symptom_description.toString()
                         val symptomImage = symptom.symptom_image
                         if (symptomImage.isNullOrBlank()) {
+                            Log.e("noimage", "noimage")
+                            Picasso.get().load(R.drawable.image_symptom).into(holder.symptomImage)
+                        } else {
                             Glide.with(ctx!!)
                                 .load(symptomImage)
                                 .fitCenter()
                                 .into(holder.symptomImage)
-                        } else {
 
-                            Log.e("noimage", "noimage")
-                            Picasso.get().load(R.drawable.image_symptom).into(holder.symptomImage)
                         }
                         holder.symptomName.text = symptomName
                     } else {
@@ -116,8 +115,9 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
             val popupView = inflater.inflate(R.layout.fragment_popup_symptom, null)
             val popupWindow = PopupWindow(
                 popupView,
-                600,
-                  600          )
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT
+            )
             // Set the content of the popup
             val popupDescription = popupView.findViewById<TextView>(R.id.popupSymptomDescription)
             popupDescription.text = symptomDescription
@@ -126,6 +126,10 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
             currentPopupWindow = popupWindow
             popupWindow.isTouchable = true
             popupWindow.isOutsideTouchable = true
+            popupWindow.setOnDismissListener {
+                currentPopupWindow = null
+            }
+
             popupView.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     popupWindow.dismiss()

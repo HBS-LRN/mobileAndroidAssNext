@@ -16,10 +16,6 @@
             android:id="@+id/workoutListFragment"
             android:icon="@drawable/baseline_accessibility_white_24"
             android:title="All Workouts"/>
-        <item
-            android:id="@+id/userListFragment"
-            android:icon="@drawable/baseline_person_24"
-            android:title="All Users"/>
 
         <item
             android:id="@+id/symptomListFragment2"
@@ -51,6 +47,11 @@
             android:id="@+id/userRatingFragment"
             android:icon="@drawable/baseline_stars_24"
             android:title="All Rating"/>
+
+        <item
+            android:id="@+id/userListFragment"
+            android:icon="@drawable/baseline_person_24"
+            android:title="All Users"/>
         <item
             android:id="@+id/adminListFragment"
             android:icon="@drawable/baseline_admin_panel_settings_24"
