@@ -52,7 +52,7 @@
                 android:layout_marginTop="45dp"
 
                 android:fontFamily="@font/poppins_bold"
-                android:text="Create User"
+                android:text="Create Event"
                 android:textColor="@color/logintext"
                 android:textSize="27dp" />
 

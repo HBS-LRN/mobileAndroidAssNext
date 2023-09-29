@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Symptom
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.entities.User
 
@@ -30,6 +31,8 @@ interface EventDao {
     @Query("SELECT * FROM event ORDER BY id DESC")
     fun getAllEvents() : LiveData<List<Event>>
 
+    @Query("SELECT * FROM event WHERE id = :eventId")
+    fun getEventById(eventId: Int): Event
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
      fun insertEvents(event: Event)

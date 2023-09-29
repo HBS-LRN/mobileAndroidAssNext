@@ -3,6 +3,8 @@ package com.example.bait2073mobileapplicationdevelopment.screens.event.EventList
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -39,12 +41,7 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
          recyclerListDataDao = repository.retrieve()
     }
 
-    fun getLocalDao(){
-        recyclerListDataDao.observeForever { newData ->
-                recyclerListData.postValue(newData)
-                Log.e("Error Event API onResponse", "Local Database ${newData}")
-        }
-    }
+
 
 
 
@@ -100,7 +97,7 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
         call.enqueue(object : Callback<List<Event>> {
             override fun onFailure(call: Call<List<Event>>, t: Throwable) {
                 Log.e("Event API Error", "API call failed: ${t.message}")
-
+                getLocalDao()
             }
 
             override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
@@ -109,7 +106,6 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
                     Log.e("Event onResponse", "Response successful, code: ${eventList}")
 
                     if (eventList != null && eventList.isNotEmpty()) {
-//                        val activeEvents = eventList.filter { it.status != "Inactive" }
                         recyclerListData.postValue(response.body())
                         insertEventDataIntoRoomDb(eventList)
 
@@ -123,6 +119,8 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
             }
         })
     }
+
+
 
 
     fun getEventsHaventPart(user_id : Int?) {
@@ -140,8 +138,6 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
                     Log.e("Event onResponseHere", "Response successful, code: ${user_id} <- -> ${eventList}")
 
                     if (eventList != null && eventList.isNotEmpty()) {
-
-//                        val activeEvents = eventList.filter { it.status != "Inactive" }
                         recyclerListData.postValue(response.body())
                         insertEventDataIntoRoomDb(eventList)
 
@@ -156,6 +152,14 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
         })
     }
 
+
+    fun getLocalDao(){
+        recyclerListDataDao.observeForever { newData ->
+            val sortedData = newData.sortedBy { it.id }
+            recyclerListData.postValue(sortedData)
+            Log.e("Error Event API onResponse", "Local Database ${newData}")
+        }
+    }
 
 
 
