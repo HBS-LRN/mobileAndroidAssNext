@@ -45,7 +45,6 @@ class UserListFragment: Fragment(), UserAdapter.UserClickListener, PopupMenu.OnM
         binding = FragmentUserListBinding.inflate(inflater, container, false)
         initViewModel()
         initRecyclerView()
-
         observeUserDeletion()
         searchUser()
 
@@ -96,10 +95,7 @@ class UserListFragment: Fragment(), UserAdapter.UserClickListener, PopupMenu.OnM
 
 
         viewModelFactory = UserListViewModelFactory()
-
         viewModel = ViewModelProvider(this, viewModelFactory).get(UserListViewModel::class.java)
-
-
 
 
 

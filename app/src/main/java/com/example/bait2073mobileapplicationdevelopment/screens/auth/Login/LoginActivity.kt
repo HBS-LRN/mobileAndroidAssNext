@@ -27,36 +27,22 @@ import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.
 import com.example.bait2073mobileapplicationdevelopment.screens.auth.SignUp.SignUpActivity
 import com.example.bait2073mobileapplicationdevelopment.screens.fragment.MainFragment
 import com.example.bait2073mobileapplicationdevelopment.screens.fragment.StaffMainFragment
+import com.example.bait2073mobileapplicationdevelopment.screens.hospital.hospitalForm.HospitalFormViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.password.RequestEmail.RequestEmailActivity
 
 class LoginActivity : AppCompatActivity() {
-//    var callSignUp: Button? = null
-//    var login_btn: Button? = null
-//    var image: ImageView? = null
-//    var logoText: TextView? = null
-//    var sloganText: TextView? = null
-//    var username: TextInputLayout? = null
-//    var password: TextInputLayout? = null
 
     private lateinit var binding: ActivityLoginBinding
     lateinit var viewModel: LoginViewModel
     private lateinit var dialog: Dialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState) //This Line will hide the status bar from the screen
-
-
         binding = ActivityLoginBinding.inflate(layoutInflater)
-
-
         setContentView(binding.root)
-
-
         initViewModel()
         getAuthenticateUserObservable()
-
         validateOnChangeEmail()
         validateOnChangePassword()
-
         getInternetConnectionObservable()
         binding.callSignUp.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
@@ -71,9 +57,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.loginButton.setOnClickListener {
 
-
-
-
+            //validate user form
             if(validateForm()) {
                 val user = LoginUser(
                     null,
@@ -83,11 +67,49 @@ class LoginActivity : AppCompatActivity() {
                     null
                 )
 
+                //authenticate using retrofit
                 viewModel.authenticate(user)
             }
         }
 
 
+    }
+    private fun getInternetConnectionObservable() {
+        viewModel.networkErrorLiveData.observe(this) { _ ->
+            // Show  network error dialog here
+            showLostInternetDialog()
+        }
+    }
+
+    private fun getAuthenticateUserObservable() {
+        viewModel.getAuthenticateUserObservable().observe(this, Observer<LoginUser?> {
+            if (it == null) {
+                val layoutEmail: TextInputLayout = binding.layoutEmail
+                val layoutPass: TextInputLayout = binding.layoutPassword
+                layoutEmail.error = "Invalid Email And/Or Password"
+                layoutPass.error = "Invalid Email And/Or Password"
+            } else {
+                saveUserDataToSharedPreferences(this, it.id ?: 0, it.name)
+                if (it.role == 0) {
+                    //user intent
+                    Log.e("cutomerintent", "cutomerintent")
+                    val intent = Intent(this, MainFragment::class.java)
+                    startActivity(intent)
+                } else {
+                    //admin intent
+                    val intent = Intent(this, StaffMainFragment::class.java)
+                    startActivity(intent)
+                }
+
+            }
+        })
+    }
+
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
+        ).get(LoginViewModel::class.java)
     }
 
 
@@ -110,47 +132,6 @@ class LoginActivity : AppCompatActivity() {
 
 
     }
-
-    private fun getInternetConnectionObservable() {
-
-        viewModel.networkErrorLiveData.observe(this) { _ ->
-            // Show your network error dialog here
-            showLostInternetDialog()
-        }
-    }
-
-    private fun getAuthenticateUserObservable() {
-        viewModel.getAuthenticateUserObservable().observe(this, Observer<LoginUser?> {
-            if (it == null) {
-                val layoutEmail: TextInputLayout = binding.layoutEmail
-                val layoutPass: TextInputLayout = binding.layoutPassword
-                layoutEmail.error = "Invalid Email And/Or Password"
-                layoutPass.error = "Invalid Email And/Or Password"
-            } else {
-                saveUserDataToSharedPreferences(this, it.id ?: 0, it.name)
-
-                var role = it.role
-                Log.e("cutomerintent", "$role")
-                if (it.role == 0) {
-                    //customer intent
-                    Log.e("cutomerintent", "cutomerintent")
-                    val intent = Intent(this, MainFragment::class.java)
-                    startActivity(intent)
-                } else {
-                    val intent = Intent(this, StaffMainFragment::class.java)
-                    startActivity(intent)
-                }
-
-            }
-        })
-    }
-
-    private fun initViewModel() {
-        viewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
-
-    }
-
 
     private fun showLostInternetDialog(){
         dialog = Dialog(this)
