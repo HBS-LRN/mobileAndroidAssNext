@@ -34,8 +34,14 @@ import com.example.bait2073mobileapplicationdevelopment.adapter.UserEventPartLis
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentEventBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.AdminFormViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.AdminFormViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventForm.EventFormViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventList.EventListViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm.EventFormViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventList.EventListFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventList.EventListViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.event.EventParticipants.EventParticipantsViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
 
 
@@ -119,8 +125,16 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
     fun initViewModel(){
         val userData = retrieveUserDataFromSharedPreferences(requireContext())
         val userId = userData?.first
-        viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-            .get(EventListViewModel::class.java)
+//        viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
+//            .get(EventListViewModel::class.java)
+
+        viewModel = ViewModelProvider(
+            this,
+            EventListViewModelFactory(requireActivity().application)
+        ).get(EventListViewModel::class.java)
+
+
+
 
         viewModel.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<Event?>>{
                 eventListResponse->
@@ -138,8 +152,15 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
 
         viewModel.getEventsHaventPart(userId)
 
-        viewModelPart = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-            .get(EventParticipantsViewModel::class.java)
+//        viewModelPart = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
+//            .get(EventParticipantsViewModel::class.java)
+
+
+        viewModelPart = ViewModelProvider(
+            this,
+            EventParticipantsViewModelFactory()
+        ).get(EventParticipantsViewModel::class.java)
+
 
         viewModelPart.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<Event?>?>{
                 eventListResponse->

@@ -29,7 +29,7 @@ class AdapterEventClass(
         val currentItem = dataList[position]
         holder.rvImage.setImageResource(currentItem.dataImage)
         holder.rvTitle.text = currentItem.dataTitle
-        holder.rvDetail.text = currentItem.dataDetail
+//        holder.rvDetail.text = currentItem.dataDetail
         holder.itemView.setOnClickListener { view: View ->
             view.findNavController()
                 .navigate(R.id.action_eventFragment_to_eventDetailsFragment)
@@ -39,6 +39,6 @@ class AdapterEventClass(
     class ViewHolderClass(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val rvImage: ImageView = itemView.findViewById(R.id.item_image)
         val rvTitle: TextView = itemView.findViewById(R.id.item_title)
-        val rvDetail: TextView = itemView.findViewById(R.id.item_details)
+//        val rvDetail: TextView = itemView.findViewById(R.id.item_details)
     }
 }

@@ -23,6 +23,7 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Hospita
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Symptom
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
+import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
 import com.example.bait2073mobileapplicationdevelopment.entities.Hospital
 import com.example.bait2073mobileapplicationdevelopment.entities.PersonalizedWorkout
 import com.example.bait2073mobileapplicationdevelopment.entities.Recipe
@@ -35,7 +36,7 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Workout
 import com.example.bait2073mobileapplicationdevelopment.utilities.DateConverter
 
 
-@Database(entities = [User::class,PersonalizedWorkout::class,StartWorkout::class, Event::class,UserPlan::class,UserPlanList::class,Workout::class, Disease::class, Symptom::class, Disease_Symptom::class, Recipe::class, Disease_Recipe::class, Hospital::class, Disease_Hospital::class],version = 1,exportSchema = false)
+@Database(entities = [User::class,PersonalizedWorkout::class,StartWorkout::class, Event::class,EventParticipants::class,UserPlan::class,UserPlanList::class,Workout::class, Disease::class, Symptom::class, Disease_Symptom::class, Recipe::class, Disease_Recipe::class, Hospital::class, Disease_Hospital::class],version = 1,exportSchema = false)
 @TypeConverters(DateConverter::class)
 abstract class HealthyLifeDatabase: RoomDatabase()  {
 

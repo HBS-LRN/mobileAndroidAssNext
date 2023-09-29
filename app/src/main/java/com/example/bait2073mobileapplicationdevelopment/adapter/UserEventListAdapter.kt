@@ -59,7 +59,7 @@ class UserEventListAdapter (private val context: Context, val listener:EventClic
     inner class EventViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val event_layout= itemView.findViewById<CardView>(R.id.event_list_user_layout)
         val eventTitle = itemView.findViewById<TextView>(R.id.item_title)
-        val eventDetails = itemView.findViewById<TextView>(R.id.item_details)
+//        val eventDetails = itemView.findViewById<TextView>(R.id.item_details)
         val eventDate = itemView.findViewById<TextView>(R.id.textView4)
         val btn = itemView.findViewById<Button>(R.id.component4)
     }
@@ -87,7 +87,7 @@ class UserEventListAdapter (private val context: Context, val listener:EventClic
 
         holder.eventDate.text =  "${month}\n${day}"
 
-        holder.eventDetails.text = currentEvent.details?:""
+//        holder.eventDetails.text = currentEvent.details?:""
 
         Log.e("EventListAdapter","${currentEvent.image} event image")
 
