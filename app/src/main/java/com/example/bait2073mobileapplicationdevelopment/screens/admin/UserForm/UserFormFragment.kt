@@ -60,13 +60,10 @@ class UserFormFragment : Fragment() {
         if (user_id != 0) {
             loadUserData(user_id)
         }
-
         validateOnChangeUserName()
         validateOnChangeEmail()
         validateOnChangeUserWeight()
         validateOnChangeUserHeight()
-
-
         binding.createButton.setOnClickListener {
 
             if(validateForm()) {
@@ -83,11 +80,11 @@ class UserFormFragment : Fragment() {
     }
 
 
-    // Function to show a dialog for choosing between gallery and camera
-    // User Can Only update jpeg, jpg or png
+    // Function to show a dialog for choosing gallery
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"  // Set the MIME type to images only
+        // User Can Only update jpeg, jpg or png
         intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/jpg", "image/png"))
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }

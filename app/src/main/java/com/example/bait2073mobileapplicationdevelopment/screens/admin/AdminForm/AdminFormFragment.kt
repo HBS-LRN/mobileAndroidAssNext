@@ -346,7 +346,7 @@ class AdminFormFragment : Fragment() {
             isValidate = false
         }
         if (phoneError != null) {
-            layoutPhone.error = nameError
+            layoutPhone.error = phoneError
             isValidate = false
         }
 

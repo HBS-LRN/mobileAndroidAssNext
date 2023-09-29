@@ -20,15 +20,12 @@ import retrofit2.Response
 class LoginViewModel  : ViewModel()  {
 
 
-    private lateinit var dialog: Dialog
-    lateinit var authenticateUserData: MutableLiveData<LoginUser?>
+    var authenticateUserData: MutableLiveData<LoginUser?>
     val networkErrorLiveData = MutableLiveData<Unit>()
 
 
     init {
-
         authenticateUserData = MutableLiveData()
-
     }
 
     fun getAuthenticateUserObservable(): MutableLiveData<LoginUser?> {
@@ -41,17 +38,16 @@ class LoginViewModel  : ViewModel()  {
         call.enqueue(object : Callback<LoginUser?> {
 
             override fun onFailure(call: Call<LoginUser?>, t: Throwable) {
-
+                //if user do not have internet network
                 networkErrorLiveData.postValue(Unit)
             }
 
             override fun onResponse(call: Call<LoginUser?>, response: Response<LoginUser?>) {
                 if (response.isSuccessful) {
                     val resposne = response.body()
-                    Log.i("haha", "$resposne")
+                    Log.i("success", "$resposne")
                     authenticateUserData.postValue(response.body())
                 } else {
-                    val resposne = response.body()
                     val errorBody = response.errorBody()?.string()
                     val responseCode = response.code()
                     val responseMessage = response.message()

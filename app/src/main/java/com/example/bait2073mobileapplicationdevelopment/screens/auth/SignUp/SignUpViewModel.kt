@@ -20,8 +20,6 @@ class SignUpViewModel : ViewModel() {
 
     init {
         createNewUserLiveData = MutableLiveData()
-
-
     }
 
     fun getCreateNewUserObservable(): MutableLiveData<RegisterUser?> {
