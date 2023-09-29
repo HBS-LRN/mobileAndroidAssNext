@@ -22,6 +22,8 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE id = :userId")
     fun getUserById(userId: Int): LiveData<User>
 
+    @Query("SELECT * FROM user WHERE id = :userId")
+    fun getUserCreateEventById(userId: Int): User
 
 
     //@Query("SELECT *

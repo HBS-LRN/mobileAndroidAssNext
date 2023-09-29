@@ -19,7 +19,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
-import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
+
+
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminList.AdminListFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventList.EventListFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
@@ -35,7 +36,7 @@ class UserEventListAdapter (private val context: Context, val listener:EventClic
 
     private var ctx: Context?=null
     var eventList = mutableListOf<Event>()
-    var eventPartList = mutableListOf<EventParticipants>()
+    var eventPartList = mutableListOf<Event>()
     var fullList = mutableListOf<Event>()
     lateinit var viewModelEventParticipants: EventParticipantsViewModel
 
@@ -159,7 +160,7 @@ class UserEventListAdapter (private val context: Context, val listener:EventClic
         notifyDataSetChanged()
     }
 
-//    fun updateEventPartList(newEventPartList:List<EventParticipants>){
+//    fun updateEventPartList(newEventPartList:List<Event>){
 //
 //        eventPartList.addAll(newEventPartList)
 //        notifyDataSetChanged()

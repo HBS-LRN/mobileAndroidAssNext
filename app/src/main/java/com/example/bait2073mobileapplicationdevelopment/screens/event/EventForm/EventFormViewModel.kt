@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm
 
+import EventParticipantsRepository
 import android.app.Application
 import android.os.CountDownTimer
 import android.util.Log
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
+import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventDataService
 import com.example.bait2073mobileapplicationdevelopment.repository.EventRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
@@ -23,6 +25,9 @@ import java.text.SimpleDateFormat
 
 class EventFormViewModel (application: Application): ViewModel() {
     private val repository : EventRepository
+
+    private val repositoryEP : EventParticipantsRepository
+    val recyclerListDataDao: LiveData<List<EventParticipants>>
 
     lateinit var createNewEventLiveData: MutableLiveData<Event?>
     lateinit var loadEventData: MutableLiveData<Event?>
@@ -38,6 +43,11 @@ class EventFormViewModel (application: Application): ViewModel() {
         repository = EventRepository(dao)
         createNewEventLiveData = MutableLiveData()
         loadEventData = MutableLiveData()
+
+
+        val daoEventPart = HealthyLifeDatabase.getDatabase(application).eventPartDao()
+        repositoryEP = EventParticipantsRepository(daoEventPart)
+        recyclerListDataDao = repositoryEP.retrieve()
 
     }
     fun startCountdown(targetDateStr: String) {
@@ -197,8 +207,6 @@ class EventFormViewModel (application: Application): ViewModel() {
                     loadEventData.postValue(null)
                 }
             }
-
-
         })
     }
 
@@ -206,13 +214,18 @@ class EventFormViewModel (application: Application): ViewModel() {
         var success = false
         viewModelScope.launch(Dispatchers.IO) {
             val localData = repository.retrieveId(event_id)
-
+            val localEPData = repositoryEP.retrieveId(event_id)
             // Check if localData is not null and post it to the LiveData
             if (localData != null) {
                 loadEventData.postValue(localData)
                 eventDataDao = localData
                 success = true
-            } else {
+            } else if(localEPData != null){
+                loadEventData.postValue(localEPData)
+                eventDataDao = localEPData
+                success = true
+            }
+            else {
                 Log.e("getEventData onFailure", "Local data retrieval failed")
                 loadEventData.postValue(null)
                 success = false

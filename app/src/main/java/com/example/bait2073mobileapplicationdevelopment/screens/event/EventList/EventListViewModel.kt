@@ -38,7 +38,7 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
         val dao = HealthyLifeDatabase.getDatabase(application).eventDao()
         repository = EventRepository(dao)
         allEvent = repository.allEvents
-         recyclerListDataDao = repository.retrieve()
+        recyclerListDataDao = repository.retrieve()
     }
 
 
@@ -120,39 +120,6 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
         })
     }
 
-
-
-
-    fun getEventsHaventPart(user_id : Int?) {
-        val service = RetrofitClientInstance.retrofitInstance!!.create(GetEventParticipantsDataService::class.java)
-        val call = service.getEventUserHaventParticipantsList(user_id)
-        call.enqueue(object : Callback<List<Event>> {
-            override fun onFailure(call: Call<List<Event>>, t: Throwable) {
-                Log.e("Event API Error", "API call failed: ${t.message}")
-
-            }
-
-            override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
-                if (response.isSuccessful) {
-                    val eventList = response.body()
-                    Log.e("Event onResponseHere", "Response successful, code: ${user_id} <- -> ${eventList}")
-
-                    if (eventList != null && eventList.isNotEmpty()) {
-                        recyclerListData.postValue(response.body())
-                        insertEventDataIntoRoomDb(eventList)
-
-                        Log.e("Event API Error", "LOCAL WORK Data retrieved from API")
-                    } else {
-                        Log.e("Error Event API onResponse", "API response body is empty")
-                    }
-                } else {
-                    Log.e("Error Event API onResponse", "API response not successful, code: ${response.code()}")
-                }
-            }
-        })
-    }
-
-
     fun getLocalDao(){
         recyclerListDataDao.observeForever { newData ->
             val sortedData = newData.sortedBy { it.id }
@@ -160,9 +127,6 @@ class EventListViewModel (application: Application): AndroidViewModel(applicatio
             Log.e("Error Event API onResponse", "Local Database ${newData}")
         }
     }
-
-
-
 
 
     fun deleteEvent(event: Event){

@@ -9,18 +9,46 @@ import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "EventParticipants")
 class EventParticipants (
-    @ColumnInfo(name="event_id")
-    @Expose
-    @SerializedName("event_id")
-    val event_id: Int?,
 
-    @ColumnInfo(name="user_id")
+    @PrimaryKey
+    @ColumnInfo(name="id")
     @Expose
-    @SerializedName("user_id")
-    val user_id: Int?,
+    @SerializedName("id")
+    val id: Int?,
+
+    @ColumnInfo(name="title")
+    @Expose
+    @SerializedName("title")
+    val title: String?,
+
+    @ColumnInfo(name="details")
+    @Expose
+    @SerializedName("details")
+    val details: String?,
+
+    @ColumnInfo(name = "image")
+    @Expose
+    @SerializedName("image")
+    val image: String?,
+
+    @ColumnInfo(name="date")
+    @Expose
+    @SerializedName("date")
+    val date: String?,
+
+    @ColumnInfo(name="address")
+    @Expose
+    @SerializedName("address")
+    val address: String?,
 
     @ColumnInfo(name="status")
     @Expose
     @SerializedName("status")
-    val status: String,
+    var status: String?,
+
+    @ColumnInfo(name="user_id")
+    @Expose
+    @SerializedName("user_id")
+    val user_id: Int?
     )
+

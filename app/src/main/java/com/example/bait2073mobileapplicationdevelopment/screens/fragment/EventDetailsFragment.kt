@@ -31,6 +31,7 @@ import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentEventDetailsBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
+import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipantsTable
 import com.example.bait2073mobileapplicationdevelopment.entities.User
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventDataService
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventParticipantsDataService
@@ -135,7 +136,7 @@ class EventDetailsFragment : Fragment() {
 
         viewModelEventParticipants= ViewModelProvider(
             this,
-            EventParticipantsViewModelFactory()
+            EventParticipantsViewModelFactory(requireActivity().application)
         ).get(EventParticipantsViewModel::class.java)
 
 
@@ -163,7 +164,7 @@ class EventDetailsFragment : Fragment() {
         val args = EventDetailsFragmentArgs.fromBundle(requireArguments())
         val eventId = args.eventId
         val userId = userData?.first
-        val eventPart = EventParticipants(
+        val eventPart = EventParticipantsTable(
             null,
             eventId,
             userId,

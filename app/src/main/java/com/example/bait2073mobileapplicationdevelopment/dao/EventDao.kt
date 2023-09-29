@@ -31,7 +31,7 @@ interface EventDao {
     @Query("SELECT * FROM event ORDER BY id DESC")
     fun getAllEvents() : LiveData<List<Event>>
 
-    @Query("SELECT * FROM event WHERE id = :eventId")
+    @Query("SELECT * FROM event WHERE id = :eventId ORDER BY id DESC")
     fun getEventById(eventId: Int): Event
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

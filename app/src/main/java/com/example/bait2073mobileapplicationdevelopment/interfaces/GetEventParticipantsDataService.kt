@@ -2,6 +2,7 @@ package com.example.bait2073mobileapplicationdevelopment.interfaces
 
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
+import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipantsTable
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -31,13 +32,13 @@ interface GetEventParticipantsDataService {
 
     @GET("eventsParticipants/update-status/{user_id}")
     @Headers("Accept:application/json","Content-Type:application/json")
-    fun getEventUserParticipantsList(@Path("user_id") user_id: Int?): Call<List<Event>>
+    fun getEventUserParticipantsList(@Path("user_id") user_id: Int?): Call<List<EventParticipants>>
 
 
     @POST("eventsParticipants")
     @Headers("Accept:application/json", "Content-Type:application/json",
         "Authorization: Bearer 73668350bdf06c66f3388408c1a712b378c3e25da599753b21b664a6261e246c")
-    fun addEventParticipants(@Body params: EventParticipants): Call<EventParticipants>
+    fun addEventParticipants(@Body params: EventParticipantsTable): Call<EventParticipantsTable>
 
     @PATCH("eventsParticipants/{event_id}")
     @Headers("Accept:application/json", "Content-Type:application/json",
@@ -54,7 +55,7 @@ interface GetEventParticipantsDataService {
     fun deleteEventParticipants(
         @Path("event_id") eventId: Int,
         @Path("user_id") userId: Int
-    ): Call<Event>
+    ): Call<EventParticipants>
 
 
 
