@@ -50,7 +50,7 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
     lateinit var recyclerViewAdapter: UserEventListAdapter
     lateinit var recyclerViewAdapterPart: UserEventPartListAdapter
 
-    lateinit var viewModel: EventListViewModel
+//    lateinit var viewModel: EventListViewModel
     lateinit var viewModelPart: EventParticipantsViewModel
 
 //    lateinit var api: GetEventDataService
@@ -68,9 +68,8 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
         binding = FragmentEventBinding.inflate(inflater, container, false)
         initViewModel()
         initRecyclerView()
-        observeEventDeletion()
+//        observeEventDeletion()
         searchEvent()
-        getLocalDao()
 
 //        binding.addEventBtn.setOnClickListener {
 //            val action =
@@ -128,29 +127,27 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
 //        viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
 //            .get(EventListViewModel::class.java)
 
-        viewModel = ViewModelProvider(
-            this,
-            EventListViewModelFactory(requireActivity().application)
-        ).get(EventListViewModel::class.java)
+//        viewModel = ViewModelProvider(
+//            this,
+//            EventListViewModelFactory(requireActivity().application)
+//        ).get(EventListViewModel::class.java)
+//
+//
+//
+//
+//        viewModel.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<Event?>>{
+//                eventListResponse->
+//            if (eventListResponse==null){
+//                Toast.makeText(requireContext(),"EventListFragment initViewModel() no result found...",Toast.LENGTH_LONG).show()
+//            }else{
+//                val eventList = eventListResponse.filterNotNull().toMutableList()
+//                Log.i("EventListFragment","initViewModel:\n"+"$eventList")
+//                recyclerViewAdapter.updateList(eventList)
+//                recyclerViewAdapter.notifyDataSetChanged()
+//            }
+//        })
 
 
-
-
-        viewModel.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<Event?>>{
-                eventListResponse->
-            if (eventListResponse==null){
-                Toast.makeText(requireContext(),"EventListFragment initViewModel() no result found...",Toast.LENGTH_LONG).show()
-            }else{
-                val eventList = eventListResponse.filterNotNull().toMutableList()
-                Log.i("EventListFragment","initViewModel:\n"+"$eventList")
-                recyclerViewAdapter.updateList(eventList)
-                recyclerViewAdapter.notifyDataSetChanged()
-
-
-            }
-        })
-
-        viewModel.getEventsHaventPart(userId)
 
 //        viewModelPart = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
 //            .get(EventParticipantsViewModel::class.java)
@@ -158,11 +155,11 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
 
         viewModelPart = ViewModelProvider(
             this,
-            EventParticipantsViewModelFactory()
+            EventParticipantsViewModelFactory(requireActivity().application)
         ).get(EventParticipantsViewModel::class.java)
 
 
-        viewModelPart.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<Event?>?>{
+        viewModelPart.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<EventParticipants?>?>{
                 eventListResponse->
             if (eventListResponse==null){
 //                Toast.makeText(requireContext(),"EventListFragment initViewModel() no result found...",Toast.LENGTH_LONG).show()
@@ -183,8 +180,25 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
             }
         })
 
+        viewModelPart.getEventListEventPartObserverable().observe(viewLifecycleOwner,Observer<List<Event?>?>{
+                eventListEventPartResponse->
+            if (eventListEventPartResponse==null){
+//                Toast.makeText(requireContext(),"EventListFragment initViewModel() no result found...",Toast.LENGTH_LONG).show()
+            }else{
+
+                val eventList = eventListEventPartResponse.filterNotNull().toMutableList()
+                Log.i("viewModelPart","initViewModel:\n"+"$eventList")
+                if (eventList.isNotEmpty()) {
+                    Log.i("viewModelPart", "initViewModel:\n" + "$eventList")
+                    recyclerViewAdapter.updateList(eventList)
+                    recyclerViewAdapter.notifyDataSetChanged()
+                }
+            }
+        })
+
 
         viewModelPart.getEventsPart(userId)
+        viewModelPart.getEventsHaventPart(userId)
     }
 
 
@@ -209,7 +223,7 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
         if(requestCode==1000){
             val userData = retrieveUserDataFromSharedPreferences(requireContext())
             val userId = userData?.first
-            viewModel.getEvents()
+            viewModelPart.getEventsHaventPart(userId)
             viewModelPart.getEventsPart(userId)
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -236,22 +250,22 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         if(item?.itemId == R.id.delete_note){
-            viewModel.deleteEvent(selectedEvent)
+
         }
         return false
     }
 
-    private fun observeEventDeletion(){
-        viewModel.getDeleteEventObservable().observe(viewLifecycleOwner,Observer<Event?>{
-                deletedUser ->
-            if(deletedUser == null){
-                Toast.makeText(requireContext(), "Cannot Delete Event", Toast.LENGTH_SHORT).show()
-            }else{
-                showSuccessDialog()
-                viewModel.getEvents()
-            }
-        })
-    }
+//    private fun observeEventDeletion(){
+//        viewModel.getDeleteEventObservable().observe(viewLifecycleOwner,Observer<Event?>{
+//                deletedUser ->
+//            if(deletedUser == null){
+//                Toast.makeText(requireContext(), "Cannot Delete Event", Toast.LENGTH_SHORT).show()
+//            }else{
+//                showSuccessDialog()
+//                viewModel.getEvents()
+//            }
+//        })
+//    }
 
     private fun showSuccessDialog(){
         dialog = Dialog(requireContext())
@@ -278,178 +292,7 @@ class EventFragment: Fragment(), UserEventListAdapter.EventClickListerner, Popup
         dialog.show()
     }
 
-    fun getLocalDao(){
-        if (!checkForInternet(context)) {
-            viewModel.getLocalDao()
-            Log.e("Nooo", "${!checkForInternet(context)}")
-        }else{
-            initViewModel()
-        }
-    }
-
-    private fun checkForInternet(context: Context?): Boolean {
-
-        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-            return when {
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                else -> false
-            }
-        } else {
-            @Suppress("DEPRECATION") val networkInfo =
-                connectivityManager.activeNetworkInfo ?: return false
-            @Suppress("DEPRECATION")
-            return networkInfo.isConnected
-        }
-    }
 
 
 }
 
-//
-//class EventFragment : Fragment(), UserEventListAdapter.EventClickListerner, PopupMenu.OnMenuItemClickListener {
-//    private lateinit var binding: FragmentEventBinding
-//    private lateinit var bindingRecycle: RecycleviewEventBinding
-//    lateinit var viewModel: EventListViewModel
-//    lateinit var recyclerViewAdapter: UserEventListAdapter
-//
-//
-//    lateinit var imageList: Array<Int>
-//    lateinit var titleList: Array<String>
-//    lateinit var detailList: Array<String>
-//    lateinit var recycleView: RecyclerView
-//    lateinit var dataList: ArrayList<EventDataClass>
-//
-//    lateinit var selectedEvent : Event
-//
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View? {
-//        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false)
-//        bindingRecycle = DataBindingUtil.inflate(inflater, R.layout.recycleview_event, container, false)
-//
-//
-//        initViewModel()
-//
-////        bindingRecycle.CardView.setOnClickListener{
-////            Toast.makeText(requireContext(), "CardView Clicked!", Toast.LENGTH_SHORT).show()
-//////            findNavController().navigate(R.id.)
-////
-//////            childFragmentManager.beginTransaction().replace(R.id.eventFrame, EventDetailsFragment()).commit()
-////        }
-//
-//
-//
-////        bindingRecycle.CardView.setOnClickListener {
-////            Toast.makeText(requireContext(), "CardView Clicked!", Toast.LENGTH_SHORT).show()
-////            val intent = Intent(requireContext(), EventDetailsActivity::class.java)
-////            startActivity(intent)
-////        }
-//
-//        val context: Context =  requireContext()
-//        val message = "Your toast message here"
-//        val duration = Toast.LENGTH_SHORT
-//
-////        Toast.makeText(context, message, duration).show()
-//
-//        imageList = arrayOf(
-//            R.drawable.event_run3,
-//            R.drawable.event_vaccine,
-//            R.drawable.event_run2
-//        )
-//
-//        titleList = arrayOf(
-//            "Event run until you cry in Kuala Lumpur",
-//            "Event free vaccine in Kuala Lumpur",
-//            "Event Marathon 30km in Kuala Lumpur"
-//        )
-//        detailList = arrayOf(
-//            "45 people going",
-//            "145 people going",
-//            "95 people going"
-//        )
-//
-//        recycleView = binding.recycleViewEventListUser
-//        recycleView.layoutManager = LinearLayoutManager(requireContext())
-//        recycleView.setHasFixedSize(true)
-//
-//        dataList = arrayListOf<EventDataClass>()
-//        getData()
-//        // Use the regular layout for the RecyclerView item
-//        val adapter = AdapterEventClass(dataList,parentFragmentManager)
-//
-//        recycleView.adapter = adapter
-//
-//        return binding.root
-//    }
-//
-//
-//    private fun getData() {
-//        for (i in imageList.indices) {
-//            val dataClass = EventDataClass(imageList[i], titleList[i], detailList[i])
-//            dataList.add(dataClass)
-//        }
-//        Log.d("EventFragment", "DataList size: ${dataList.size}")
-//    }
-//
-//    private fun popUpDisplay(cardView:CardView){
-//        val popup = PopupMenu(requireContext(),cardView)
-//        popup.setOnMenuItemClickListener(this)
-//        popup.inflate(R.menu.pop_up_menu)
-//        popup.show()
-//    }
-//
-//    fun initViewModel(){
-//        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-//            .get(EventListViewModel::class.java)
-//
-//        viewModel.getEventListObserverable().observe(viewLifecycleOwner, Observer<List<Event?>>{
-//                eventListResponse->
-//            if (eventListResponse==null){
-//                Toast.makeText(requireContext(),"EventListFragment initViewModel() no result found...",Toast.LENGTH_LONG).show()
-//            }else{
-//                val eventList = eventListResponse.filterNotNull().toMutableList()
-//                Log.i("EventListFragment","initViewModel:\n"+"$eventList")
-//                recyclerViewAdapter.updateList(eventList)
-//                recyclerViewAdapter.notifyDataSetChanged()
-//            }
-//        })
-//        viewModel.getEvents()
-//    }
-//
-//
-//    override fun onItemClicked(event: Event) {
-//        val action=
-//            EventListFragmentDirections.actionEventListFragmentToManageEventFragment(event.id?:0)
-//        this.findNavController().navigate(action)
-//    }
-//
-//    override fun onLongItemClicked(event: Event, cardView: CardView) {
-//        selectedEvent=event
-//        popUpDisplay(cardView)
-//    }
-//
-//    override fun onMenuItemClick(p0: MenuItem?): Boolean {
-//        TODO("Not yet implemented")
-//    }
-//
-////    override fun onMenuItemClick(p0: MenuItem?): Boolean {
-////        if(item?.itemId == R.id.delete_note){
-////            viewModel.deleteEvent(selectedEvent)
-////        }
-////        return false
-////    }
-//
-////    private fun replaceFragment(fragment: Fragment) {
-////        val fragmentManager = childFragmentManager
-////        val fragmentTransaction = fragmentManager.beginTransaction()
-////        fragmentTransaction.replace(R.id.fragment_layout, fragment)
-////        fragmentTransaction.commit()
-////    }
-//
-//}

@@ -35,13 +35,13 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 
 
     private var ctx: Context?=null
-    var eventList = mutableListOf<Event>()
-    var eventPartList = mutableListOf<Event>()
-    var fullList = mutableListOf<Event>()
+    var eventList = mutableListOf<EventParticipants>()
+    var eventPartList = mutableListOf<EventParticipants>()
+    var fullList = mutableListOf<EventParticipants>()
 
 
-    fun setData(arrData: List<Event>) {
-        eventList = arrData as ArrayList<Event>
+    fun setData(arrData: List<EventParticipants>) {
+        eventList = arrData as ArrayList<EventParticipants>
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
@@ -256,7 +256,7 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 //    }
 
 
-    fun updateList(newList: MutableList<Event>){
+    fun updateList(newList: MutableList<EventParticipants>){
         fullList.clear()
         fullList.addAll(newList)
         eventList.clear()
@@ -287,8 +287,8 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 
 
     interface EventClickListerner{
-        fun onItemClicked(event: Event)
-        fun onLongItemClicked(event: Event, cardView: CardView)
+        fun onItemClicked(event: EventParticipants)
+        fun onLongItemClicked(event: EventParticipants, cardView: CardView)
     }
 
 
