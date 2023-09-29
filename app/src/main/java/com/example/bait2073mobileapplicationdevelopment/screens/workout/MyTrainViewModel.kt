@@ -175,6 +175,7 @@ class MyTrainViewModel: ViewModel() {
         // If there are none, delete the user plan directly
         val service = RetrofitClientInstance.retrofitInstance!!.create(GetUserPLanListService::class.java)
         val call = service.checkUserPlanListEmpty(userPlanId) // Replace with the actual API call to check if the list is empty
+
         call.enqueue(object : Callback<Boolean?> {
 
             override fun onFailure(call: Call<Boolean?>, t: Throwable) {
@@ -210,6 +211,8 @@ class MyTrainViewModel: ViewModel() {
                 }
             }
         })
+
+
     }
 
 

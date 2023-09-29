@@ -1,51 +1,28 @@
-package com.example.bait2073mobileapplicationdevelopment.screens.fragment
+package com.example.bait2073mobileapplicationdevelopment.screens.workout
 
 import UserPlanListModel
 import android.app.Dialog
-import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.BitmapShader
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.Shader
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.*
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.bait2073mobileapplicationdevelopment.R
-import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentStartPersonalizedPlanBinding
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentStartPlanBinding
-import com.example.bait2073mobileapplicationdevelopment.entities.PersonalizedWorkout
 import com.example.bait2073mobileapplicationdevelopment.entities.StartWorkout
 import com.example.bait2073mobileapplicationdevelopment.entities.UserPlanList
-import com.example.bait2073mobileapplicationdevelopment.screens.personalized.StartPersonalizedFragmentDirections
-import com.example.bait2073mobileapplicationdevelopment.screens.personalized.StartPersonalizedViewModel
-import com.example.bait2073mobileapplicationdevelopment.screens.workout.AddPlanListArgs
-import com.example.bait2073mobileapplicationdevelopment.screens.workout.StartUserWorkoutPlanViewModel
-import com.example.bait2073mobileapplicationdevelopment.viewmodel.PersonalizedWorkoutViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.workout.StartPlanDirections
 import com.example.bait2073mobileapplicationdevelopment.viewmodel.StartWorkOutViewModel
-import com.example.bait2073mobileapplicationdevelopment.viewmodel.UserPlanViewModel
 import java.util.Date
 
 
@@ -75,7 +52,10 @@ class StartPlan : Fragment() {
 //        val factory = StartPersonalizedViewModelFactory()
 //        viewModel = ViewModelProvider(this, factory).get(StartPersonalizedViewModel::class.java)
         Log.i("GameFragment", "Called ViewModelProvider.get")
-        viewModel = ViewModelProvider(this).get(StartUserWorkoutPlanViewModel::class.java)
+//        viewModel = ViewModelProvider(this).get(StartUserWorkoutPlanViewModel::class.java)
+        // Inside your StartPlan fragment
+        viewModel = ViewModelProvider(this, StartUserWorkoutPlanViewModelFactory(this)).get(StartUserWorkoutPlanViewModel::class.java)
+
 //        viewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
 //            binding.scoreText.text = newScore.toString()
 //

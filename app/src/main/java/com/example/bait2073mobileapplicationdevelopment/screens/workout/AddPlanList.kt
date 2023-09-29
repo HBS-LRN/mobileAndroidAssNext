@@ -89,12 +89,15 @@ class AddPlanList : Fragment(), WorkOutAdapter.WorkoutClickListener {
     }
 
     fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            AddPlanListViewModel::class.java
-        )
+//        viewModel = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(
+//            AddPlanListViewModel::class.java
+//        )
+        // Inside your AddPlanList fragment
+        viewModel = ViewModelProvider(this, AddPlanListViewModelFactory()).get(AddPlanListViewModel::class.java)
+
 
 
         viewModel.getWorkoutObserverable()

@@ -15,7 +15,7 @@ class UserPlanRepository(private val userPlanDao: UserPlanDao) {
     }
 
     // Function to insert a new user plan
-    suspend fun insertUserPlan(userPlan: UserPlan) {
+    fun insertUserPlan(userPlan: UserPlan) {
         userPlanDao.insertUserPlan(userPlan)
     }
 
@@ -27,5 +27,8 @@ class UserPlanRepository(private val userPlanDao: UserPlanDao) {
     // Function to update a user plan's name
     suspend fun updateUserPlan(userPlan: UserPlan) {
         userPlanDao.updateUserPlan(userPlan)
+    }
+    suspend fun getUserPlansByUserId(plan_name: String){
+        userPlanDao.getUserPlansByName(plan_name)
     }
 }

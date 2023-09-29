@@ -15,7 +15,8 @@ interface UserPlanDao {
     fun getAllUserPlans(): LiveData<List<UserPlan>>
     @Query("SELECT * FROM user_plan WHERE user_id = :userId")
     fun getUserPlansByUserId(userId: Int): LiveData<List<UserPlan>>
-
+    @Query("SELECT * FROM user_plan WHERE plan_name = :plan_name")
+    fun getUserPlansByName(plan_name: String): LiveData<List<UserPlan>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUserPlan(userPlan: UserPlan)
 

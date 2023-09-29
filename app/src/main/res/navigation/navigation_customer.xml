@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/startPlan"
-        android:name="com.example.bait2073mobileapplicationdevelopment.screens.fragment.StartPlan"
+        android:name="com.example.bait2073mobileapplicationdevelopment.screens.workout.StartPlan"
         android:label="Start Plan"
         tools:layout="@layout/fragment_start_plan" >
         <action

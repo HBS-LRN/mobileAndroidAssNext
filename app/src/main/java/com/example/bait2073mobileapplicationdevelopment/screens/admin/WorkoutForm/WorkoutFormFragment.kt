@@ -118,6 +118,7 @@ class WorkoutFormFragment : Fragment() {
         if (workout_id != 0) {
 
             binding.createTitletv.text = "Update Workout"
+            binding.createButton.text = "Update"
             loadWorkoutData(workout_id)
         }
 
@@ -264,20 +265,24 @@ class WorkoutFormFragment : Fragment() {
                 PICK_IMAGE_REQUEST -> {
                     val selectedImageUri = data?.data
                     if (selectedImageUri != null) {
-
-                        binding.gifImageView.setImageURI(selectedImageUri)
-                        selectedGifUri = selectedImageUri
+                        if (selectedImageUri.toString().endsWith(".gif")) {
+                            binding.gifImageView.setImageURI(selectedImageUri)
+                            selectedGifUri = selectedImageUri
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Please select a .gif image.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }else{
+                        Toast.makeText(
+                            requireContext(),
+                            "Required to insert gif image.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
-
-//                CAPTURE_IMAGE_REQUEST -> {
-//                    val imageBitmap = data?.extras?.get("data") as Bitmap?
-//                    // Handle the captured image bitmap (e.g., display it, store it, etc.)
-//                    if (imageBitmap != null) {
-//                        selectedGifUri =
-//                            imageBitmap // Store the captured image in the variable
-//                    }
-//                }
             }
         }
     }
@@ -346,7 +351,7 @@ class WorkoutFormFragment : Fragment() {
     private fun initViewModel() {
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            WorkoutFormViewModelFactory()
         ).get(WorkoutFormViewModel::class.java)
 
     }

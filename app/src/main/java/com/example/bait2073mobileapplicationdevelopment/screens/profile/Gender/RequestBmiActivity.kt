@@ -1,4 +1,4 @@
-package com.example.bait2073mobileapplicationdevelopment.screens.profile.BMI
+package com.example.bait2073mobileapplicationdevelopment.screens.profile.Gender
 
 
 import android.content.Context
@@ -12,9 +12,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.bait2073mobileapplicationdevelopment.databinding.AcitvityRequestBmiBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.UpdateBmiUser
-import com.example.bait2073mobileapplicationdevelopment.entities.UpdateGenderUser
 import com.example.bait2073mobileapplicationdevelopment.screens.fragment.MainFragment
-import com.example.bait2073mobileapplicationdevelopment.screens.profile.Gender.RequestGenderViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.profile.BMI.RequestBmiActivityViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.profile.BMI.RequestBmiActivityViewModelFactory
 
 
 class RequestBmiActivity : AppCompatActivity(){

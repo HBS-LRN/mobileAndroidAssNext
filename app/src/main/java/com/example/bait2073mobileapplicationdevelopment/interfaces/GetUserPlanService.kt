@@ -18,6 +18,9 @@ interface GetUserPlanService {
     @GET("userPlans/{user_id}")
     fun getUserPlan(@Path("user_id") user_id: Int): Call<List<UserPlan>>
 
+    @GET("userPlans/{user_id}")
+    fun getUserPlanByName(@Path("user_id") plan_name: String): Call<List<UserPlan>>
+
     @DELETE("deleteUserPlan/{user_id}")
     @Headers("Accept:application/json", "Content-Type:application/json",
         "Authorization: Bearer 73668350bdf06c66f3388408c1a712b378c3e25da599753b21b664a6261e246c")

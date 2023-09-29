@@ -25,9 +25,10 @@ class UserPlanListAdapter(private val context: Context, private val listener: Us
     var userPlanWorkoutfullList = mutableListOf<UserPlanList>()
 
     fun setData(newData:  List<UserPlan>) {
-        UserPlan.clear()
-        UserPlan.addAll(newData)
-        notifyDataSetChanged()
+        UserPlan = newData as ArrayList<UserPlan>
+//        UserPlan.clear()
+//        UserPlan.addAll(newData)
+//        notifyDataSetChanged()
     }
     fun setUserPlanData(newData:  List<UserPlanList>) {
         UserPlanList.clear()
@@ -58,39 +59,36 @@ class UserPlanListAdapter(private val context: Context, private val listener: Us
 
     override fun onBindViewHolder(holder: UserPlanListViewHolder, position: Int) {
         val currentUserPlan = UserPlan[position]
-        val currentUserPlanList = UserPlanList
 
         val service = RetrofitClientInstance.retrofitInstance!!.create(GetUserPLanListService::class.java)
         val call = service.getUserPlanListByUserPlanId(currentUserPlan.id)
-        call.enqueue(object : Callback<List<UserPlanList>> {
-            override fun onResponse(call: Call<List<UserPlanList>>, response: Response<List<UserPlanList>>) {
-                if (response.isSuccessful) {
-                    val userPlanList = response.body()
-                    val totalExcise = userPlanList?.size ?: 0 // Get the size of the fetched list
 
-                    holder.planName.text = currentUserPlan.plan_name
-                    holder.totalExcise.text = totalExcise.toString()
+            call.enqueue(object : Callback<List<UserPlanList>> {
+                override fun onResponse(call: Call<List<UserPlanList>>, response: Response<List<UserPlanList>>) {
+                    if (response.isSuccessful) {
+                        val userPlanList = response.body()
+                        val totalExcise = userPlanList?.size ?: 0 // Get the size of the fetched list
 
-                    holder.userPlan_layout.setOnClickListener {
-                        listener.onItemClicked(UserPlan[holder.adapterPosition])
+                        holder.planName.text = currentUserPlan.plan_name
+                        holder.totalExcise.text = totalExcise.toString()
+
+                        holder.userPlan_layout.setOnClickListener {
+                            listener.onItemClicked(UserPlan[holder.adapterPosition])
+                        }
+
+                        holder.userPlan_layout.setOnLongClickListener {
+                            listener.OnLongItemClicked(UserPlan[holder.adapterPosition], holder.userPlan_layout)
+                            true
+                        }
+                    } else {
+                        // Handle the case where the API request was not successful
                     }
-
-                    holder.userPlan_layout.setOnLongClickListener {
-                        listener.OnLongItemClicked(UserPlan[holder.adapterPosition], holder.userPlan_layout)
-                        true
-                    }
-                } else {
-                    // Handle the case where the API request was not successful
                 }
-            }
 
-            override fun onFailure(call: Call<List<UserPlanList>>, t: Throwable) {
-                // Handle the failure of the API request
-            }
-        })
-
-
-
+                override fun onFailure(call: Call<List<UserPlanList>>, t: Throwable) {
+                    // Handle the failure of the API request
+                }
+            })
 
     }
     fun updateUserPlanList(newList : List<UserPlan>){
@@ -100,10 +98,24 @@ class UserPlanListAdapter(private val context: Context, private val listener: Us
         UserPlanfullList.addAll(newList)
         UserPlan.clear()
         UserPlan.addAll(UserPlanfullList)
-        Log.e("gg","$UserPlan")
+//        Log.e("gg","$UserPlan")
         notifyDataSetChanged()
     }
 
+    fun filerList(search: String) {
+        Log.e("TestSearch","filerList")
+        UserPlan.clear()
+
+        for (item in UserPlanfullList) {
+            Log.e("TestSearch","${item.plan_name}")
+            if (item.plan_name?.lowercase()?.contains(search.lowercase()) == true) {
+                UserPlan.add(item)
+                Log.e("TestSearchNAme","${item.plan_name}")
+            }
+        }
+
+        notifyDataSetChanged()
+    }
 
 
     interface UserPlanClickListener {

@@ -5,10 +5,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.bait2073mobileapplicationdevelopment.entities.PersonalizedWorkout
 import com.example.bait2073mobileapplicationdevelopment.entities.UserPlanList
 
-class StartUserWorkoutPlanViewModel : ViewModel() {
+class StartUserWorkoutPlanViewModel(workoutList: StartPlan) : ViewModel() {
     // The current word
     // The current word
 

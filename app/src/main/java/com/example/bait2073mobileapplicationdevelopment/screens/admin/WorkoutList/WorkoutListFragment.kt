@@ -123,10 +123,8 @@ class WorkoutListFragment : Fragment(), WorkoutListAdapter.WorkoutClickListener,
     fun initViewModel() {
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            WorkoutListViewModel::class.java
-        )
+            WorkoutListViewModelFactory()
+        ).get(WorkoutListViewModel::class.java)
 
 
         viewModel.getWorkoutListObserverable()

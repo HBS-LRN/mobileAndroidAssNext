@@ -81,7 +81,7 @@
             android:exported="true" />
 
         <activity
-            android:name=".screens.profile.BMI.RequestBmiActivity"
+            android:name=".screens.profile.Gender.RequestBmiActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"

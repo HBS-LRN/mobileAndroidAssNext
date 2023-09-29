@@ -1,6 +1,7 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.workout
 
 import UserPlanListAdapter
+import UserPlanViewModelFactory
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
@@ -17,6 +18,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -36,13 +38,18 @@ import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserList.U
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.WorkoutList.WorkoutListFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.dialog.AddPlanPopUpFragment
 import com.example.bait2073mobileapplicationdevelopment.viewmodel.UserPlanViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 
 class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, PopupMenu.OnMenuItemClickListener {
 
     lateinit var recyclerViewAdapter: UserPlanListAdapter
     lateinit var viewModel: MyTrainViewModel
     private lateinit var binding: FragmentMyTrainListBinding
-
+    lateinit var  roomDBviewModel:UserPlanViewModel
     lateinit var selectedPlan: UserPlan
     private lateinit var dialog: Dialog
 
@@ -60,7 +67,7 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
         }
 
         createUserObservable()
-
+        searchPlan()
         Log.e("mytrainlist","mytrain")
 
 
@@ -69,6 +76,12 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
 
     }
 
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =
+            requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
 
     private fun showPlanNameDialog() {
         val builder = AlertDialog.Builder(requireContext())
@@ -159,6 +172,24 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
 //            dialog.show()
 //        }
 //    }
+private fun searchPlan() {
+    Log.e("TestSearch","searchPlan")
+    binding.searchPlanView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            Log.e("TestSearch","searchfalse")
+            return false;
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            Log.e("TestSearch","searchPlanText")
+            if (newText != null) {
+                recyclerViewAdapter.filerList(newText)
+            }
+            return true
+
+        }
+    })
+}
 
     private fun retrieveUserDataFromSharedPreferences(context: Context): Pair<Int, String>? {
         val sharedPreferences: SharedPreferences =
@@ -178,12 +209,29 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
     }
 
     private fun initRecyclerView() {
+
+        val userData = retrieveUserDataFromSharedPreferences(requireContext())
+        val userId = userData?.first!!
+        val isNetworkAvailable = isNetworkAvailable()
         binding.recycleView.setHasFixedSize(true)
         binding.recycleView.layoutManager = StaggeredGridLayoutManager(1, LinearLayout.VERTICAL)
+//        recyclerViewAdapter = UserPlanListAdapter(requireContext(), this)
         recyclerViewAdapter = UserPlanListAdapter(requireContext(), this)
         binding.recycleView.adapter = recyclerViewAdapter
+        Log.e("LostConnectCheck","$isNetworkAvailable")
+        if(isNetworkAvailable){
+            Log.e("LostConnect","$isNetworkAvailable")
+            roomDBviewModel.getUserPlansByUserId(userId).observe(/* owner = */ viewLifecycleOwner, /* observer = */
+                Observer { userPlans ->
+                // Handle the data retrieved from the local database
+                recyclerViewAdapter.setData(userPlans)
+                recyclerViewAdapter.notifyDataSetChanged()
+            })
+        }
+
         //recyclerViewAdapter.setData() // Replace 'yourUserPlanListData' with your actual data
 //        recyclerViewAdapter.notifyDataSetChanged()
+
     }
 
     private fun initViewModel() {
@@ -191,13 +239,9 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
 
         val userData = retrieveUserDataFromSharedPreferences(requireContext())
         val userId = userData?.first!!
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            MyTrainViewModel::class.java
-        )
-
+        val factory = MyTrainViewModelFactory()
+        viewModel = ViewModelProvider(this, factory).get(MyTrainViewModel::class.java)
+        roomDBviewModel  = ViewModelProvider(this, UserPlanViewModelFactory(requireActivity().application)).get(UserPlanViewModel::class.java)
         viewModel.getUserPlanObserverable()
             .observe(viewLifecycleOwner, Observer<List<UserPlan?>> { userListResponse ->
                 if (userListResponse == null) {
@@ -209,7 +253,7 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
 
                     recyclerViewAdapter.updateUserPlanList(userPlanList)
                     recyclerViewAdapter.setData(userPlanList)
-
+                    insertDataIntoRoomDb(userPlanList)
                     recyclerViewAdapter.notifyDataSetChanged()
 
                 }
@@ -233,6 +277,28 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
 //        selectedPlan = userPlan
 //        popUpDisplay(cardView)
 //    }
+fun insertDataIntoRoomDb(userPlan: List<UserPlan>) {
+    try {
+        // Launch a coroutine to perform the database operation
+        CoroutineScope(Dispatchers.IO).launch {
+            for (userPlanList in userPlan) {
+                Log.d("InsertDataIntoRoomDb", "Inserting workout with ID: ${userPlanList}")
+                roomDBviewModel.insertUserPlan(
+                    UserPlan(
+                        id = userPlanList.id,
+                        user_id= userPlanList.user_id,
+                        plan_name = userPlanList.plan_name
+                    )
+                )
+            }
+        }
+    } catch (e: Exception) {
+        Log.e(
+            "InsertDataIntoRoomDb",
+            "Error inserting data into Room Database: ${e.message}",
+        )
+    }
+}
 
     private fun popUpDisplay(cardView: CardView) {
 

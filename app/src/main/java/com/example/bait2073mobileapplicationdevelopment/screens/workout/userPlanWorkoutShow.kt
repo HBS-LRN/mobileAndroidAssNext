@@ -119,16 +119,9 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
         Log.e("TestUserPlanID","$user_plan_id")
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            userrPlanWorkoutViewModel::class.java
-        )
-        viewModelPlan = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            MyTrainViewModel::class.java
-        )
+            userPlanWorkoutViewModelFactory()
+        ).get(userrPlanWorkoutViewModel::class.java)
+        viewModelPlan = ViewModelProvider(this, MyTrainViewModelFactory()).get(MyTrainViewModel::class.java)
 
 
         viewModel.getWorkoutListObserverable()

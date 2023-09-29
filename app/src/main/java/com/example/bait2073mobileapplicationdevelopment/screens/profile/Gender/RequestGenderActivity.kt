@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.databinding.ActivityRequestGenderBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.UpdateGenderUser
-import com.example.bait2073mobileapplicationdevelopment.screens.profile.BMI.RequestBmiActivity
 
 class RequestGenderActivity : AppCompatActivity() {
 
