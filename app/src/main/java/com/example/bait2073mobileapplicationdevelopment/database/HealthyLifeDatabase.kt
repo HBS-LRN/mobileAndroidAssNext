@@ -10,6 +10,7 @@ import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseHospitalDao
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseRecipeDao
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseSymptomDao
 import com.example.bait2073mobileapplicationdevelopment.dao.EventDao
+import com.example.bait2073mobileapplicationdevelopment.dao.EventParticipantsDao
 import com.example.bait2073mobileapplicationdevelopment.dao.HospitalDao
 import com.example.bait2073mobileapplicationdevelopment.dao.PersonalizedWorkoutDao
 import com.example.bait2073mobileapplicationdevelopment.dao.RecipeDao
@@ -72,4 +73,5 @@ abstract class HealthyLifeDatabase: RoomDatabase()  {
     abstract fun hospitalDao(): HospitalDao
     abstract fun diseaseHospitalDao(): DiseaseHospitalDao
     abstract fun eventDao(): EventDao
+    abstract fun eventPartDao(): EventParticipantsDao
 }
