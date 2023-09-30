@@ -1,6 +1,7 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.symptom.symptomList
 
 
+import SymptomListViewModelFactory
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -40,15 +41,13 @@ class SymptomListFragment: Fragment(),SymptomListAdapter.SymptomClickListener, P
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSymptomListBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            SymptomListViewModel::class.java)
+        viewModel = ViewModelProvider(this, SymptomListViewModelFactory(requireActivity().application)
+        ).get(SymptomListViewModel::class.java)
 
         viewModel.getSymptomListObservable().observe(viewLifecycleOwner, Observer<List<Symptom?>> {symptomListResponse ->
             if(symptomListResponse == null) {
                 Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG).show()
             } else {
-//               adapter.setData(it.toList().get(1))
                 val symptomList = symptomListResponse.filterNotNull().toMutableList()
                 Log.i("haha", "$symptomList")
                 adapter.setData(symptomList)
@@ -167,7 +166,7 @@ class SymptomListFragment: Fragment(),SymptomListAdapter.SymptomClickListener, P
         dialog.setCancelable(false) // Optional
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
 
-        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation // Setting the animations to dialog
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
 
         val okay: Button = dialog.findViewById(R.id.btn_okay)
         val cancel: Button = dialog.findViewById(R.id.btn_cancel)
@@ -182,7 +181,7 @@ class SymptomListFragment: Fragment(),SymptomListAdapter.SymptomClickListener, P
         }
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
-        dialog.show() // Showing the dialog here
+        dialog.show()
     }
 
 }

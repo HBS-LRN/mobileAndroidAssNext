@@ -1,6 +1,8 @@
 package com.example.bait2073mobileapplicationdevelopment.adapter
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -18,6 +20,8 @@ import com.bumptech.glide.Glide
 import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.data.DiseasedataClass
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseHospital_Room
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseSymptom_Room
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Symptom
 import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseDataService
@@ -38,6 +42,10 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
     var diseaseSymptomList = mutableListOf<Disease_Symptom>()
     var fullList = mutableListOf<Disease_Symptom>()
 
+    var diseaseSymptomRoomList = mutableListOf<DiseaseSymptom_Room>()
+    var fullRoomList = mutableListOf<DiseaseSymptom_Room>()
+
+    var symptomDescription : String = ""
     private var currentPopupWindow: PopupWindow? = null
 
     private var ctx: Context? = null
@@ -47,6 +55,13 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
         fullList.addAll(newData)
         diseaseSymptomList.clear()
         diseaseSymptomList.addAll(fullList)
+        notifyDataSetChanged()
+    }
+    fun setRoomData(newData: List<DiseaseSymptom_Room>) {
+        fullRoomList.clear()
+        fullRoomList.addAll(newData)
+        diseaseSymptomRoomList.clear()
+        diseaseSymptomRoomList.addAll(fullRoomList)
         notifyDataSetChanged()
     }
 
@@ -65,9 +80,9 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
     }
 
     override fun onBindViewHolder(holder: DiseaseCauseSymptomViewHolder, position: Int) {
+        if(isNetworkAvailable(context)){
         val currentSymptom = diseaseSymptomList[position]
         val symptomId= currentSymptom.symptom_id
-        var symptomDescription : String = ""
         Log.i("diseasesymptomlist", "$diseaseSymptomList")
 
         apiService2.getSymptom(symptomId).enqueue(object : Callback<Symptom> {
@@ -76,7 +91,7 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
                     val symptom = response.body()
                     Log.i("symptommatch", "$symptom")
                     if (symptom != null) {
-                        // Access the symptom_name and description from the disease object
+
                         val symptomName = symptom.symptom_name
                         symptomDescription = symptom.symptom_description.toString()
                         val symptomImage = symptom.symptom_image
@@ -101,16 +116,29 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
             }
 
             override fun onFailure(call: Call<Symptom>, t: Throwable) {
-                // Handle network failures here
                 holder.symptomName.text = "Unknown Symptom"
             }
         })
+        }else{
+            val currentSymptomRoom = diseaseSymptomRoomList[position]
+            val symptomName = currentSymptomRoom.symptom_name
+            holder.symptomName.text = symptomName
+            symptomDescription = currentSymptomRoom.symptom_description.toString()
+            val symptomImage = currentSymptomRoom.symptom_image
+            if (symptomImage.isNullOrBlank()) {
+                Log.e("noimage", "noimage")
+                Picasso.get().load(R.drawable.image_symptom).into(holder.symptomImage)
+            } else {
+                Glide.with(ctx!!)
+                    .load(symptomImage)
+                    .fitCenter()
+                    .into(holder.symptomImage)
+            }
+
+        }
 
         holder.causeSymptomCard.setOnClickListener{
             currentPopupWindow?.dismiss()
-
-            //create a popup window
-
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val popupView = inflater.inflate(R.layout.fragment_popup_symptom, null)
             val popupWindow = PopupWindow(
@@ -118,7 +146,7 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
-            // Set the content of the popup
+
             val popupDescription = popupView.findViewById<TextView>(R.id.popupSymptomDescription)
             popupDescription.text = symptomDescription
             popupWindow.showAsDropDown(holder.causeSymptomCard)
@@ -144,6 +172,15 @@ class DiseaseCauseSymptomAdapter(private val context : Context) : RecyclerView.A
 
     override fun getItemCount(): Int {
         return diseaseSymptomList.size
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
 }

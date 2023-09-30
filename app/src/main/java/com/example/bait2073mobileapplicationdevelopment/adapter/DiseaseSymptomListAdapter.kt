@@ -35,18 +35,8 @@ class DiseaseSymptomListAdapter(private val context : Context, val listener: Dis
     var fullList = mutableListOf<Disease_Symptom>()
     val diseaseList = mutableListOf<DiseasedataClass>()
 
-//    var diseaseList = mutableListOf<Disease>()
-//    var symptomList = mutableListOf<Symptom>()
-//    var diseaseFullList = mutableListOf<Disease>()
-//    var symptomFullList = mutableListOf<Symptom>()
-
-//    var diseaseListSource = mutableListOf<Disease>()
-//    var symptomListSource = mutableListOf<Symptom>()
-    // Maintain a mapping of disease_id to diseaseName
-    private val diseaseNameMap = mutableMapOf<Int, String>()
     private var ctx: Context? = null
 
-//not sure need setdata for these disease & symptom list source or not
     fun setData(newData: List<Disease_Symptom>) {
         fullList.clear()
         fullList.addAll(newData)
@@ -54,21 +44,6 @@ class DiseaseSymptomListAdapter(private val context : Context, val listener: Dis
         diseaseSymptomList.addAll(fullList)
         notifyDataSetChanged()
     }
-//    fun setDiseaseData(newDData: List<Disease>) {
-//        diseaseFullList.clear()
-//        diseaseFullList.addAll(newDData)
-//        diseaseList.clear()
-//        diseaseList.addAll(diseaseFullList)
-//        notifyDataSetChanged()
-//    }
-//
-//fun setSymptomData(newSData:List<Symptom>){
-//    symptomFullList.clear()
-//    symptomFullList.addAll(newSData)
-//    symptomList.clear()
-//    symptomList.addAll(symptomFullList)
-//    notifyDataSetChanged()
-//}
 
     inner class DiseaseSymptomListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val diseaseSymptomListCard = itemView.findViewById<CardView>(R.id.subs_layout)
@@ -147,26 +122,6 @@ class DiseaseSymptomListAdapter(private val context : Context, val listener: Dis
             }
         })
 
-//        val matchingDisease = diseaseList.find { it.id == diseaseId }
-//
-//        if (matchingDisease != null) {
-//            holder.diseaseName.text = matchingDisease.disease_name
-//
-//        } else {
-//            // Handle the case where no matching disease is found
-//            holder.diseaseName.text = "Unknown Disease"
-//        }
-
-        // Lookup symptom name based on symptom ID
-//        val symptomId = currentDiseaseSymptom.symptom_id
-//        val matchingSymptom = symptomList.find { it.id == symptomId }
-//        if (matchingSymptom != null) {
-//            holder.symptomName.text = matchingSymptom.symptom_name
-//        } else {
-//            // Handle the case where no matching symptom is found
-//            holder.symptomName.text = "Unknown Symptom"
-//        }
-
 
         holder.diseaseSymptomListCard.setOnLongClickListener {
 
@@ -197,11 +152,6 @@ class DiseaseSymptomListAdapter(private val context : Context, val listener: Dis
         notifyDataSetChanged()
     }
 
-    // Function to update the disease name mapping
-    fun updateDiseaseNameMapping(mapping: Map<Int, String>) {
-        diseaseNameMap.clear()
-        diseaseNameMap.putAll(mapping)
-    }
 
     interface DiseaseSymptomClickListener{
         fun onItemClicked(diseaseSymptom: Disease_Symptom)

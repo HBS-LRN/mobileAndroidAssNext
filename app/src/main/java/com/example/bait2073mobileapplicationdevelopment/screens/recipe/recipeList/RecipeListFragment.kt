@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.recipe.recipeList
 
+import RecipeListViewModelFactory
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -43,7 +44,24 @@ class RecipeListFragment : Fragment(), RecipeListAdapter.RecipeClickListener, Po
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentRecipeListBinding.inflate(inflater, container, false)
-        initViewModel()
+
+        viewModel = ViewModelProvider(
+            this,
+            RecipeListViewModelFactory(requireActivity().application)
+        ).get(RecipeListViewModel::class.java)
+
+        viewModel.getRecipeListObservable().observe(viewLifecycleOwner, Observer<List<Recipe?>> {recipeListResponse ->
+            if(recipeListResponse == null) {
+                Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG).show()
+            } else {
+                val recipeList = recipeListResponse.filterNotNull().toMutableList()
+                Log.i("haha", "$recipeList")
+                adapter.updateList(recipeList)
+                adapter.notifyDataSetChanged()
+            }
+        })
+        viewModel.getRecipeList()
+
         initRecyclerView()
         observeRecipeDeletion()
         searchRecipe()
@@ -86,27 +104,8 @@ class RecipeListFragment : Fragment(), RecipeListAdapter.RecipeClickListener, Po
         binding.recycleView.layoutManager = StaggeredGridLayoutManager(1, LinearLayout.VERTICAL)
         adapter = RecipeListAdapter(requireContext(), this)
         binding.recycleView.adapter = adapter
-
     }
 
-    fun initViewModel() {
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            RecipeListViewModel::class.java)
-
-        viewModel.getRecipeListObservable().observe(viewLifecycleOwner, Observer<List<Recipe?>> {recipeListResponse ->
-            if(recipeListResponse == null) {
-                Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG).show()
-            } else {
-//                recyclerViewAdapter.updateList(it.toList().get(1))
-                val recipeList = recipeListResponse.filterNotNull().toMutableList()
-                Log.i("haha", "$recipeList")
-                adapter.updateList(recipeList)
-                adapter.notifyDataSetChanged()
-            }
-        })
-        viewModel.getRecipeList()
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 

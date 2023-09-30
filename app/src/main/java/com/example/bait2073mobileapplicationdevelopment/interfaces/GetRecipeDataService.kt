@@ -16,7 +16,7 @@ interface GetRecipeDataService {
 
     @GET("recipes/{recipe_id}")
     @Headers("Accept:application/json","Content-Type:application/json")
-    fun getRecipe(@Path("recipe_id") recipe_id: Int): Call<Recipe>
+    fun getRecipe(@Path("recipe_id") recipe_id: Int?): Call<Recipe>
 
     @POST("recipes")
     @Headers("Accept:application/json", "Content-Type:application/json")

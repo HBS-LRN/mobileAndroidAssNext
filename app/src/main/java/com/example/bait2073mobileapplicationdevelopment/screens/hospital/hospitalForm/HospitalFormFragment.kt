@@ -1,11 +1,13 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.hospital.hospitalForm
 
+import HospitalFormViewModelFactory
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -42,10 +44,8 @@ class HospitalFormFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHospitalFormBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(HospitalFormViewModel::class.java)
-        //val user_id = intent.getStringExtra("user_id")
+        viewModel = ViewModelProvider(this, HospitalFormViewModelFactory()).get(HospitalFormViewModel::class.java)
+
         createHospitalObservable()
         val args = HospitalFormFragmentArgs.fromBundle(requireArguments())
         val hospital_id = args.hospitalId
@@ -103,7 +103,7 @@ class HospitalFormFragment : Fragment() {
     private fun createHospitalObservable() {
         viewModel.getCreateHospitalObservable().observe(viewLifecycleOwner, Observer<Hospital?> {
             if (it == null) {
-                binding.layoutHospitalName.error = "Hospital Name Already Registered, Please Try Another Hospital Name"
+                Log.e("error", "error")
             } else {
                 showSuccessDialog()
             }

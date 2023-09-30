@@ -30,9 +30,8 @@ class DiseaseRecipeListAdapter (private val context : Context, val listener: Dis
     )
     var diseaseRecipeList = mutableListOf<Disease_Recipe>()
     var fullList = mutableListOf<Disease_Recipe>()
-    val diseaseList = mutableListOf<DiseasedataClass>()//need change
+    val diseaseList = mutableListOf<DiseasedataClass>()
 
-    private val diseaseNameMap = mutableMapOf<Int, String>()
     private var ctx: Context? = null
 
     fun setData(newData: List<Disease_Recipe>) {

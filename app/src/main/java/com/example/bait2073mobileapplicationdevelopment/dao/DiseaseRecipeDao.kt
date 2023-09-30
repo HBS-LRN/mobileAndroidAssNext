@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
 
 @Dao
@@ -13,17 +13,9 @@ interface DiseaseRecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDiseaseRecipe(diseaseRecipe: Disease_Recipe)
 
-//    @Update
-//    fun updateDiseaseRecipe(diseaseRecipe: Disease_Recipe)
+    @Query("SELECT * from disease_recipe WHERE id = :diseaseRecipeId")
+    fun getDiseaseRecipeById(diseaseRecipeId: Int): LiveData<Disease_Recipe>
 
-        @Query("SELECT * from disease_recipe WHERE id = :diseaseRecipeId")
-        fun getDiseaseRecipeById(diseaseRecipeId: Int): LiveData<Disease_Recipe>
-
-//    @Query("SELECT * from disease_recipe WHERE disease_id = :diseaseID")
-//    fun getDiseaseRecipeById(diseaseID: Int): LiveData<Disease_Recipe>
-//
-//    @Query("SELECT * from disease_recipe WHERE recipe_id = :symptomID")
-//    fun getRecipeDiseaseById(symptomID: Int): LiveData<Disease_Recipe>
 
     @Query("SELECT * FROM disease_recipe")
     fun getAllDiseasesRecipe(): LiveData<List<Disease_Recipe>>

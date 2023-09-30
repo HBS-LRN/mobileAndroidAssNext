@@ -1,9 +1,12 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseMain
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,7 +33,6 @@ class DiseaseMainFragment : Fragment(), DiseaseMainAdapter.DiseaseMainClickListe
     private lateinit var viewModel: DiseaseListViewModel
     private lateinit var adapter: DiseaseMainAdapter
     private lateinit var binding: FragmentDiseasesPreventionBinding
-    lateinit var selectedDisease: Disease
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,18 +42,36 @@ class DiseaseMainFragment : Fragment(), DiseaseMainAdapter.DiseaseMainClickListe
         viewModel = ViewModelProvider(this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
             DiseaseListViewModel::class.java)
+        val isNetworkAvailable = isNetworkAvailable(requireContext())
 
-        viewModel.getDiseaseListObservable().observe(viewLifecycleOwner, Observer<List<Disease?>> { diseaseListResponse ->
-            if(diseaseListResponse == null) {
-                Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG).show()
-            } else {
-                val diseaseList = diseaseListResponse.filterNotNull().toMutableList()
-                Log.i("haha", "$diseaseList")
-                adapter.setData(diseaseList)
-                adapter.notifyDataSetChanged()
-            }
+        if(isNetworkAvailable) {
+            viewModel.getDiseaseList()
+            viewModel.getDiseaseListObservable()
+                .observe(viewLifecycleOwner, Observer<List<Disease?>> { diseaseListResponse ->
+                    if (diseaseListResponse == null) {
+                        Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG)
+                            .show()
+                    } else {
+                        val diseaseList = diseaseListResponse.filterNotNull().toMutableList()
+                        Log.i("haha", "$diseaseList")
+                        viewModel.removeDiseaseFromLocalDatabase()
+                        viewModel.insertDiseaseDataIntoRoomDb(diseaseList)
+                        adapter.setData(diseaseList)
+                        adapter.notifyDataSetChanged()
+                    }
+                })
+        }else{
+            viewModel.diseaseListDataDao.observe(viewLifecycleOwner, Observer { roomData ->
+                if (roomData != null && roomData.isNotEmpty()) {
+                    // Update the adapter with RoomDB data
+                    adapter.setData(roomData)
+                    adapter.notifyDataSetChanged()
+                } else {
+                    // Handle the case where RoomDB data is not available
+                    Log.i("roomdbdata", "No RoomDB data found...")
+                }
         })
-        viewModel.getDiseaseList()
+        }
 
         val diseaseRecyclerView = binding.recyclerView3
         diseaseRecyclerView.setHasFixedSize(true)
@@ -62,6 +82,7 @@ class DiseaseMainFragment : Fragment(), DiseaseMainAdapter.DiseaseMainClickListe
         viewModel.diseaseListMut.observe(viewLifecycleOwner, Observer { data ->
             adapter.setData(data as List<Disease>)
         })
+
 
         searchDisease()
 
@@ -110,5 +131,14 @@ class DiseaseMainFragment : Fragment(), DiseaseMainAdapter.DiseaseMainClickListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getDiseaseList()
+    }
+
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 }

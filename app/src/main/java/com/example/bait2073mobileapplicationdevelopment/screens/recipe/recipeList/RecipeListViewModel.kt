@@ -8,7 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bait2073mobileapplicationdevelopment.entities.Recipe
-import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetRecipeDataService
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.repository.RecipeRepository
@@ -24,6 +23,7 @@ class RecipeListViewModel(application: Application) :AndroidViewModel(applicatio
     var recyclerListData: MutableLiveData<List<Recipe?>> = MutableLiveData()
     var deleteRecipeLiveData: MutableLiveData<Recipe?> = MutableLiveData()
     private val apiService = RetrofitClientInstance.retrofitInstance!!.create(GetRecipeDataService::class.java)
+    var specificRecipeLiveData: MutableLiveData<Recipe?> = MutableLiveData()
 
     val allRecipe : LiveData<List<Recipe>>
     val recipeListDataDao : LiveData<List<Recipe>>
@@ -127,6 +127,27 @@ class RecipeListViewModel(application: Application) :AndroidViewModel(applicatio
                 }
             }
         })
+    }
+
+    fun getSpecificRecipe(recipe_id:Int?):LiveData<Recipe?> {
+
+        apiService.getRecipe(recipe_id).enqueue(object : Callback<Recipe?> {
+            override fun onFailure(call: Call<Recipe?>, t: Throwable) {
+                Log.e("error", "?error")
+                specificRecipeLiveData.postValue(null)
+            }
+
+            override fun onResponse(call: Call<Recipe?>, response: Response<Recipe?>) {
+                if(response.isSuccessful) {
+                    Log.e("Response", "Response success")
+                    specificRecipeLiveData.postValue(response.body())
+                } else {
+                    Log.e("Response", "Response body empty")
+                    specificRecipeLiveData.postValue(null)
+                }
+            }
+        })
+        return specificRecipeLiveData
     }
 
 }

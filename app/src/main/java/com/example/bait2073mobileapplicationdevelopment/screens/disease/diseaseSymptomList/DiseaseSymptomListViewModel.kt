@@ -5,15 +5,14 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bait2073mobileapplicationdevelopment.entities.Disease
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Symptom
-import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseSymptomDataService
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
-import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseRepository
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseHospital_Room
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseSymptom_Room
 import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseSymptomRepository
+import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseSymptomRoomRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,10 +32,17 @@ class DiseaseSymptomListViewModel (application: Application) : AndroidViewModel(
 
     val allDiseaseSymptom : LiveData<List<Disease_Symptom>>
     val diseaseSymptomListDataDao : LiveData<List<Disease_Symptom>>
+    val diseaseSymptomDataFromRoomDB : LiveData<List<DiseaseSymptom_Room>>
+
     private val repository : DiseaseSymptomRepository
+    private val roomRepository :DiseaseSymptomRoomRepository
+
     init{
         val dao = HealthyLifeDatabase.getDatabase(application).diseaseSymptomDao()
         repository = DiseaseSymptomRepository(dao)
+        val dao2 = HealthyLifeDatabase.getDatabase(application).diseaseSymptomRoomDao()
+        roomRepository = DiseaseSymptomRoomRepository(dao2)
+        diseaseSymptomDataFromRoomDB = roomRepository.allDiseaseSymptomsRoom
         allDiseaseSymptom = repository.allDiseaseSymptoms
         diseaseSymptomListDataDao = repository.retrieve()
     }
@@ -115,9 +121,43 @@ class DiseaseSymptomListViewModel (application: Application) : AndroidViewModel(
         }
 
     }
+
+    fun insertDiseaseSymptomRoom(diseaseSymptomRoom: DiseaseSymptom_Room)= viewModelScope.launch(Dispatchers.IO){
+        roomRepository.insert(diseaseSymptomRoom)
+    }
+
+    fun insertDiseaseSymptomRoomDataIntoRoomDb(diseaseSymptomRoom: DiseaseSymptom_Room) {
+        viewModelScope.launch {
+            this.let {
+                try {
+                        insertDiseaseSymptomRoom(
+                            DiseaseSymptom_Room(
+                                id = diseaseSymptomRoom.id,
+                                disease_id = diseaseSymptomRoom.disease_id,
+                                disease_name = diseaseSymptomRoom.disease_name,
+                                symptom_id = diseaseSymptomRoom.symptom_id,
+                                symptom_name = diseaseSymptomRoom.symptom_name,
+                                symptom_image = diseaseSymptomRoom.symptom_image,
+                                symptom_description = diseaseSymptomRoom.symptom_description,
+                            )
+                        )
+                }catch (e: Exception) {
+                    Log.e("InsertDataIntoRoomDb", "Error inserting data into Room Database: ${e.message}", e)
+                }
+            }
+        }
+
+    }
+
     private fun removeDiseaseSymptomFromLocalDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAll()
+        }
+    }
+
+    fun removeDiseaseSymptomRoomFromLocalDatabase() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.deleteAll()
         }
     }
 
@@ -169,6 +209,7 @@ class DiseaseSymptomListViewModel (application: Application) : AndroidViewModel(
         })
     }
 
+    //use for search result geh
     fun getSymptomDiseaseData(symptom_id: Int) {
         apiService.getSymptomDisease(symptom_id).enqueue(object : Callback<List<Disease_Symptom>> {
             override fun onResponse(

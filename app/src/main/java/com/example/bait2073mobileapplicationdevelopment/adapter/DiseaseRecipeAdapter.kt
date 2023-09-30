@@ -1,6 +1,8 @@
 package com.example.bait2073mobileapplicationdevelopment.adapter
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -14,6 +16,8 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bait2073mobileapplicationdevelopment.R
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseRecipe_Room
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseSymptom_Room
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
 import com.example.bait2073mobileapplicationdevelopment.entities.Recipe
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseRecipeDataService
@@ -32,8 +36,14 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
     private val apiService2 = RetrofitClientInstance.retrofitInstance!!.create(
         GetRecipeDataService::class.java
     )
+
+    var diseaseRecipeRoomList = mutableListOf<DiseaseRecipe_Room>()
+    var fullRoomList = mutableListOf<DiseaseRecipe_Room>()
+
     var diseaseRecipeList = mutableListOf<Disease_Recipe>()
     var fullList = mutableListOf<Disease_Recipe>()
+    var recipeDescription: String = ""
+    var recipeServings: Int = 0
 
     private var currentPopupWindow: PopupWindow? = null
 
@@ -44,6 +54,14 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
         fullList.addAll(newData)
         diseaseRecipeList.clear()
         diseaseRecipeList.addAll(fullList)
+        notifyDataSetChanged()
+    }
+
+    fun setRoomData(newData: List<DiseaseRecipe_Room>) {
+        fullRoomList.clear()
+        fullRoomList.addAll(newData)
+        diseaseRecipeRoomList.clear()
+        diseaseRecipeRoomList.addAll(fullRoomList)
         notifyDataSetChanged()
     }
 
@@ -62,55 +80,71 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
         }
 
         override fun onBindViewHolder(holder: DiseaseRecipeViewHolder, position: Int) {
-            val currentRecipe = diseaseRecipeList[position]
-            val recipeId = currentRecipe.recipe_id
-            var recipeDescription: String = ""
-            var recipeServings: Int = 0
-            Log.i("diseasesymptomlist", "$diseaseRecipeList")
+            if(isNetworkAvailable(context)) {
+                val currentRecipe = diseaseRecipeList[position]
+                val recipeId = currentRecipe.recipe_id
+                Log.i("diseasesymptomlist", "$diseaseRecipeList")
 
-            apiService2.getRecipe(recipeId).enqueue(object : Callback<Recipe> {
-                override fun onResponse(call: Call<Recipe>, response: Response<Recipe>) {
-                    if (response.isSuccessful) {
-                        val recipe = response.body()
-                        Log.i("recipematch", "$recipe")
-                        if (recipe != null) {
+                apiService2.getRecipe(recipeId).enqueue(object : Callback<Recipe> {
+                    override fun onResponse(call: Call<Recipe>, response: Response<Recipe>) {
+                        if (response.isSuccessful) {
+                            val recipe = response.body()
+                            Log.i("recipematch", "$recipe")
+                            if (recipe != null) {
 
-                            val recipeName = recipe.recipe_name
-                            recipeDescription = recipe.recipe_description.toString()
-                            recipeServings = recipe.recipe_servings!!
-                            val recipeImage = recipe.recipe_image
-                            if (recipeImage.isNullOrBlank()) {
-                                Log.e("noimage", "noimage")
-                                Picasso.get().load(R.drawable.diseases_recipe)
-                                    .into(holder.recipeImage)
+                                val recipeName = recipe.recipe_name
+                                recipeDescription = recipe.recipe_description.toString()
+                                recipeServings = recipe.recipe_servings!!
+                                val recipeImage = recipe.recipe_image
+                                if (recipeImage.isNullOrBlank()) {
+                                    Log.e("noimage", "noimage")
+                                    Picasso.get().load(R.drawable.diseases_recipe)
+                                        .into(holder.recipeImage)
+                                } else {
+                                    Glide.with(ctx!!)
+                                        .load(recipeImage)
+                                        .fitCenter()
+                                        .into(holder.recipeImage)
+
+                                }
+                                holder.recipeName.text = recipeName
                             } else {
-                                Glide.with(ctx!!)
-                                    .load(recipeImage)
-                                    .fitCenter()
-                                    .into(holder.recipeImage)
-
+                                holder.recipeName.text = "Unknown Recipe"
                             }
-                            holder.recipeName.text = recipeName
                         } else {
+                            // Handle the case where the API request for recipe details is not successful
                             holder.recipeName.text = "Unknown Recipe"
                         }
-                    } else {
-                        // Handle the case where the API request for recipe details is not successful
+                    }
+
+                    override fun onFailure(call: Call<Recipe>, t: Throwable) {
+                        // Handle network failures here
                         holder.recipeName.text = "Unknown Recipe"
                     }
-                }
+                })
+            }else{
+                val currentRecipeRoom = diseaseRecipeRoomList[position]
+                val recipeId = currentRecipeRoom.recipe_id
 
-                override fun onFailure(call: Call<Recipe>, t: Throwable) {
-                    // Handle network failures here
-                    holder.recipeName.text = "Unknown Recipe"
+                val recipeName = currentRecipeRoom.recipe_name
+                holder.recipeName.text = recipeName
+                recipeDescription = currentRecipeRoom.recipe_description.toString()
+                val recipeImage = currentRecipeRoom.recipe_image
+                recipeServings = currentRecipeRoom.recipe_servings!!
+                if (recipeImage.isNullOrBlank()) {
+                    Log.e("noimage", "noimage")
+                    Picasso.get().load(R.drawable.diseases_recipe).into(holder.recipeImage)
+                } else {
+                    Glide.with(ctx!!)
+                        .load(recipeImage)
+                        .fitCenter()
+                        .into(holder.recipeImage)
                 }
-            })
+            }
 
             holder.recipeCard.setOnClickListener {
                 currentPopupWindow?.dismiss()
 
-                //create a popup window
-                //create a popup window
                 val inflater =
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val popupView = inflater.inflate(R.layout.fragment_popup_recipe, null)
@@ -150,6 +184,14 @@ class DiseaseRecipeAdapter(private val context : Context) : RecyclerView.Adapter
         override fun getItemCount(): Int {
             return diseaseRecipeList.size
         }
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
+}
 
 
