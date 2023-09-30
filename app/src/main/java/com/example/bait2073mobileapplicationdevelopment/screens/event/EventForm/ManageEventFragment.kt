@@ -4,6 +4,8 @@ package com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -21,6 +23,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -31,6 +34,9 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventForm.EventFormViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserList.UserRatingViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserRating.UserRatingViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.event.EventNotificationReceiver
+import com.example.bait2073mobileapplicationdevelopment.screens.event.EventParticipants.EventParticipantsViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.event.InternetConnectionError
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.squareup.picasso.Callback
@@ -41,7 +47,6 @@ import java.util.Calendar
 import java.util.Locale
 
 class ManageEventFragment : Fragment() {
-
 
     private lateinit var viewModel: EventFormViewModel
     private lateinit var viewModelEventParticipants: EventParticipantsViewModel
@@ -63,6 +68,8 @@ class ManageEventFragment : Fragment() {
         setupDatePicker()
         initViewModel()
         createEventObservable()
+        getInternetConnectionObservable()
+//        createNotificationChannel()
         val args = ManageEventFragmentArgs.fromBundle(requireArguments())
         val event_id = args.eventId
 
@@ -84,10 +91,16 @@ class ManageEventFragment : Fragment() {
         }
 
 
+//        viewModelEventParticipants = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(EventParticipantsViewModel::class.java)
+
         viewModelEventParticipants = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            EventParticipantsViewModelFactory(requireActivity().application)
         ).get(EventParticipantsViewModel::class.java)
+
 
         viewModelEventParticipants.getEventPartSizeObserverable().observe(viewLifecycleOwner,Observer<Int?>{
                 eventListResponse->
@@ -101,8 +114,6 @@ class ManageEventFragment : Fragment() {
                     binding.numGoingAdminText.setText("Total user joined : "+eventListSize.toString())
                     Log.i("viewModelPart","initViewModel:\n"+"$eventListSize")
                 }
-
-
             }
         })
 
@@ -112,6 +123,25 @@ class ManageEventFragment : Fragment() {
         return binding.root
     }
 
+//    private fun createNotificationChannel() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val channel = NotificationChannel(
+//                EventNotificationReceiver.CHANNEL_ID,
+//                "Event Notification Channel",
+//                NotificationManager.IMPORTANCE_DEFAULT
+//            )
+//            val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//    }
+
+
+    private fun getInternetConnectionObservable() {
+        viewModel.networkErrorLiveData.observe(viewLifecycleOwner) { _ ->
+            val internetConnectionError = InternetConnectionError(requireContext())
+            internetConnectionError.showLostInternetDialog()
+        }
+    }
 
     private fun setupDatePicker() {
         val datePicker = binding.datePicker1
@@ -149,17 +179,13 @@ class ManageEventFragment : Fragment() {
         }
     }
 
-
     private fun pickImage() {
         val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
         startActivityForResult(intent, 101)
-
     }
 
-    // Function to show a dialog for choosing between gallery and camera
     private fun showImagePickerDialog() {
         val options = arrayOf("Gallery", "Camera")
-
         AlertDialog.Builder(requireContext())
             .setTitle("Choose an option")
             .setItems(options) { _, which ->
@@ -170,6 +196,7 @@ class ManageEventFragment : Fragment() {
             }
             .show()
     }
+
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
@@ -183,7 +210,6 @@ class ManageEventFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 PICK_IMAGE_REQUEST -> {
@@ -199,7 +225,6 @@ class ManageEventFragment : Fragment() {
                         }
                     }
                 }
-
                 CAPTURE_IMAGE_REQUEST -> {
                     val imageBitmap = data?.extras?.get("data") as Bitmap?
                     if (imageBitmap != null) {
@@ -209,6 +234,7 @@ class ManageEventFragment : Fragment() {
             }
         }
     }
+
     private fun loadEventData(event_id: Int?) {
         viewModel.getLoadEventObservable().observe(viewLifecycleOwner, Observer<Event?> { event ->
             if (event != null) {
@@ -257,7 +283,6 @@ class ManageEventFragment : Fragment() {
                             }
                             override fun onError(e: Exception?) {
                                 Log.e("NotNice", "${e}")
-
                             }
                         })
                 } else {
@@ -303,7 +328,7 @@ class ManageEventFragment : Fragment() {
         val userData = retrieveUserDataFromSharedPreferences(requireContext())
 
         val userId = userData?.first
-
+        val userName = userData?.second
         val event = Event(
             null,
             binding.eTextTitle.text.toString(),
@@ -321,6 +346,8 @@ class ManageEventFragment : Fragment() {
         else
             viewModel.updateEvent(event_id ?: 0, event)
     }
+
+
 
     private fun retrieveUserDataFromSharedPreferences(context: Context): Pair<Int, String>? {
         val sharedPreferences: SharedPreferences =

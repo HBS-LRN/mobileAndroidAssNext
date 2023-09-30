@@ -1,7 +1,14 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm
 
 import EventParticipantsRepository
+import android.app.AlarmManager
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.CountDownTimer
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
@@ -16,12 +23,14 @@ import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipan
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventDataService
 import com.example.bait2073mobileapplicationdevelopment.repository.EventRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
+import com.example.bait2073mobileapplicationdevelopment.screens.event.EventNotificationReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 class EventFormViewModel (application: Application): ViewModel() {
     private val repository : EventRepository
@@ -37,6 +46,7 @@ class EventFormViewModel (application: Application): ViewModel() {
 
     private var countdownTimer: CountDownTimer? = null
 
+    val networkErrorLiveData = MutableLiveData<Unit>()
 
     init {
         val dao = HealthyLifeDatabase.getDatabase(application).eventDao()
@@ -50,23 +60,75 @@ class EventFormViewModel (application: Application): ViewModel() {
         recyclerListDataDao = repositoryEP.retrieve()
 
     }
+
+//    fun startCountdown(targetDateStr: String, context: Context) {
+//        try {
+//            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+//
+//            dateFormat.timeZone = TimeZone.getTimeZone("Asia/Kuala_Lumpur")
+//
+//            val targetDate = dateFormat.parse(targetDateStr)
+//
+//            val targetDateMillis = targetDate.time
+//
+//            countdownTimer?.cancel()
+//
+//            val currentTimeMillis = System.currentTimeMillis()
+//
+//            if (targetDateMillis > currentTimeMillis) {
+//                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//                val intent = Intent(context, EventNotificationReceiver::class.java)
+//                intent.putExtra(EventNotificationReceiver.EXTRA_MESSAGE, "Event Starting")
+//
+//                val pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
+//                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+//
+//                alarmManager.set(AlarmManager.RTC_WAKEUP, targetDateMillis, pendingIntent)
+//            }
+//
+//            countdownTimer = object : CountDownTimer(targetDateMillis - currentTimeMillis, 1000) {
+//                private var totalHours = 0L
+//
+//                override fun onTick(millisUntilFinished: Long) {
+//                    val seconds = (millisUntilFinished / 1000) % 60
+//                    val minutes = ((millisUntilFinished / (1000 * 60)) % 60)
+//                    val hours = ((millisUntilFinished / (1000 * 60 * 60)) + totalHours).toInt()
+//
+//                    val formattedTime = String.format("%02d : %02d : %02d", hours, minutes, seconds)
+//
+//                    _countdownLiveData.postValue(formattedTime)
+//                }
+//
+//                override fun onFinish() {
+//                    _countdownLiveData.postValue("STARTING")
+//                }
+//            }
+//            countdownTimer?.start()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+
+
     fun startCountdown(targetDateStr: String) {
         try {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-            // Parse the string into a Date object
+            dateFormat.timeZone = TimeZone.getTimeZone("Asia/Kuala_Lumpur")
+
             val targetDate = dateFormat.parse(targetDateStr)
 
-            // Get the timestamp in milliseconds
             val targetDateMillis = targetDate.time
 
             countdownTimer?.cancel()
 
             countdownTimer = object : CountDownTimer(targetDateMillis - System.currentTimeMillis(), 1000) {
+                private var totalHours = 0L
+
                 override fun onTick(millisUntilFinished: Long) {
                     val seconds = (millisUntilFinished / 1000) % 60
                     val minutes = ((millisUntilFinished / (1000 * 60)) % 60)
-                    val hours = ((millisUntilFinished / (1000 * 60 * 60)) % 24)
+                    val hours = ((millisUntilFinished / (1000 * 60 * 60)) + totalHours).toInt()
 
                     val formattedTime = String.format("%02d : %02d : %02d", hours, minutes, seconds)
 
@@ -77,7 +139,6 @@ class EventFormViewModel (application: Application): ViewModel() {
                     _countdownLiveData.postValue("STARTING")
                 }
             }
-
             countdownTimer?.start()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -85,11 +146,10 @@ class EventFormViewModel (application: Application): ViewModel() {
     }
 
 
+
     fun observeCountdown(owner: LifecycleOwner, observer: Observer<String>) {
         _countdownLiveData.observe(owner, observer)
     }
-
-
 
     fun getCreateNewEventObservable(): MutableLiveData<Event?> {
         return createNewEventLiveData
@@ -107,6 +167,7 @@ class EventFormViewModel (application: Application): ViewModel() {
             override fun onFailure(call: Call<Event?>, t: Throwable) {
                 Log.e("createEvent onFailure", "createEvent onFailure ${t}")
                 createNewEventLiveData.postValue(null)
+                networkErrorLiveData.postValue(Unit)
             }
 
             override fun onResponse(call: Call<Event?>, response: Response<Event?>) {
@@ -127,9 +188,6 @@ class EventFormViewModel (application: Application): ViewModel() {
     }
 
 
-
-
-
     fun updateEvent(event_id: Int, event: Event) {
         val service = RetrofitClientInstance.retrofitInstance!!.create(GetEventDataService::class.java)
         val call = service.updateEvent(event_id, event)
@@ -137,6 +195,7 @@ class EventFormViewModel (application: Application): ViewModel() {
             override fun onFailure(call: Call<Event?>, t: Throwable) {
                 Log.e("updateEvent onFailure", "failure")
                 createNewEventLiveData.postValue(null)
+                networkErrorLiveData.postValue(Unit)
             }
 
             override fun onResponse(call: Call<Event?>, response: Response<Event?>) {
@@ -215,7 +274,6 @@ class EventFormViewModel (application: Application): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val localData = repository.retrieveId(event_id)
             val localEPData = repositoryEP.retrieveId(event_id)
-            // Check if localData is not null and post it to the LiveData
             if (localData != null) {
                 loadEventData.postValue(localData)
                 eventDataDao = localData

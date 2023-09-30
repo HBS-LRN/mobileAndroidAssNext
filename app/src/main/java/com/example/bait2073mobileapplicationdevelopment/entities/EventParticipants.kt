@@ -50,5 +50,9 @@ class EventParticipants (
     @Expose
     @SerializedName("user_id")
     val user_id: Int?
-    )
+
+)
+
+
+
 
