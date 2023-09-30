@@ -12,6 +12,8 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -29,13 +31,17 @@ import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentEventDetailsBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
 import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipants
+import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipantsTable
 import com.example.bait2073mobileapplicationdevelopment.entities.User
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventDataService
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventParticipantsDataService
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
 import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.AdminFormViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.AdminFormViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventForm.EventFormViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm.EventFormViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm.ManageEventFragmentDirections
+import com.example.bait2073mobileapplicationdevelopment.screens.event.EventParticipants.EventParticipantsViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -60,6 +66,11 @@ class EventDetailsFragment : Fragment() {
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_event_details, container, false)
 
+
+        val linkText = binding.getDestinationText.text
+        val mSpannableString = SpannableString(linkText)
+        mSpannableString.setSpan(UnderlineSpan(), 0, mSpannableString.length, 0)
+        binding.getDestinationText.text = mSpannableString
 
         val args = EventDetailsFragmentArgs.fromBundle(requireArguments())
          val eventId = args.eventId
@@ -97,21 +108,37 @@ class EventDetailsFragment : Fragment() {
     }
 
     private fun initViewModel() {
+//        viewModel = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(EventFormViewModel::class.java)
+//
+//        viewModelUser = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(AdminFormViewModel::class.java)
+//
+//        viewModelEventParticipants = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(EventParticipantsViewModel::class.java)
+
+
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            EventFormViewModelFactory(requireActivity().application)
         ).get(EventFormViewModel::class.java)
 
         viewModelUser = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            AdminFormViewModelFactory()
         ).get(AdminFormViewModel::class.java)
 
-
-        viewModelEventParticipants = ViewModelProvider(
+        viewModelEventParticipants= ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            EventParticipantsViewModelFactory(requireActivity().application)
         ).get(EventParticipantsViewModel::class.java)
+
 
         viewModelEventParticipants.getEventPartSizeObserverable().observe(viewLifecycleOwner,Observer<Int?>{
                 eventListResponse->
@@ -137,7 +164,8 @@ class EventDetailsFragment : Fragment() {
         val args = EventDetailsFragmentArgs.fromBundle(requireArguments())
         val eventId = args.eventId
         val userId = userData?.first
-        val eventPart = EventParticipants(
+        val eventPart = EventParticipantsTable(
+            null,
             eventId,
             userId,
             "Joined",
@@ -159,11 +187,7 @@ class EventDetailsFragment : Fragment() {
         val args = EventDetailsFragmentArgs.fromBundle(requireArguments())
         val eventId = args.eventId
         val userId = userData?.first
-        val eventPart = EventParticipants(
-            eventId,
-            userId,
-            "Joined",
-        )
+
 
         if (userId != null) {
             viewModelEventParticipants.deleteEventPart(args.eventId,userId)

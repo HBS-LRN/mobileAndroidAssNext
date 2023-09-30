@@ -31,6 +31,8 @@ import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.adapter.EventListAdapter
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentEventListBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventForm.EventFormViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventList.EventListViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm.EventFormViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
 
@@ -61,7 +63,7 @@ class EventListFragment: Fragment(), EventListAdapter.EventClickListerner, Popup
         initRecyclerView()
         observeEventDeletion()
         searchEvent()
-        getLocalDao()
+//        getLocalDao()
 
         binding.addEventBtn.setOnClickListener {
 
@@ -109,10 +111,20 @@ class EventListFragment: Fragment(), EventListAdapter.EventClickListerner, Popup
 
 
     fun initViewModel(){
-        viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-            .get(EventListViewModel::class.java)
-        viewModelForm= ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-            .get(EventFormViewModel::class.java)
+//        viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
+//            .get(EventListViewModel::class.java)
+//        viewModelForm= ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
+//            .get(EventFormViewModel::class.java)
+
+        viewModel = ViewModelProvider(
+            this,
+            EventListViewModelFactory(requireActivity().application)
+        ).get(EventListViewModel::class.java)
+
+        viewModelForm = ViewModelProvider(
+                this,
+            EventFormViewModelFactory(requireActivity().application)
+        ).get(EventFormViewModel::class.java)
 
         viewModel.getEventListObserverable().observe(viewLifecycleOwner,Observer<List<Event?>>{
                 eventListResponse->
@@ -208,7 +220,8 @@ class EventListFragment: Fragment(), EventListAdapter.EventClickListerner, Popup
     fun getLocalDao(){
         if (!checkForInternet(context)) {
             viewModel.getLocalDao()
-            Log.e("Nooo", "${!checkForInternet(context)}")
+            Log.e("Local Event", "${!checkForInternet(context)}")
+            Toast.makeText(requireContext(), "Viewing Local Database", Toast.LENGTH_SHORT).show()
         }else{
             initViewModel()
         }

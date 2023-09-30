@@ -35,13 +35,13 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 
 
     private var ctx: Context?=null
-    var eventList = mutableListOf<Event>()
-    var eventPartList = mutableListOf<Event>()
-    var fullList = mutableListOf<Event>()
+    var eventList = mutableListOf<EventParticipants>()
+    var eventPartList = mutableListOf<EventParticipants>()
+    var fullList = mutableListOf<EventParticipants>()
 
 
-    fun setData(arrData: List<Event>) {
-        eventList = arrData as ArrayList<Event>
+    fun setData(arrData: List<EventParticipants>) {
+        eventList = arrData as ArrayList<EventParticipants>
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
@@ -62,7 +62,7 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 
         holder.eventDate.text =  "${month}\n${day}"
 
-        holder.eventDetails.text = currentEvent.details?:""
+//        holder.eventDetails.text = currentEvent.details?:""
 
         Log.e("EventListAdapter","${currentEvent.image} event image")
 
@@ -170,7 +170,7 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
     inner class EventViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val event_layout= itemView.findViewById<CardView>(R.id.event_list_user_layout)
         val eventTitle = itemView.findViewById<TextView>(R.id.item_title)
-        val eventDetails = itemView.findViewById<TextView>(R.id.item_details)
+//        val eventDetails = itemView.findViewById<TextView>(R.id.item_details)
         val eventDate = itemView.findViewById<TextView>(R.id.textView4)
         val btn = itemView.findViewById<Button>(R.id.component4)
     }
@@ -256,7 +256,7 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 //    }
 
 
-    fun updateList(newList: MutableList<Event>){
+    fun updateList(newList: MutableList<EventParticipants>){
         fullList.clear()
         fullList.addAll(newList)
         eventList.clear()
@@ -287,8 +287,8 @@ class UserEventPartListAdapter(private val context: Context, val listener: Event
 
 
     interface EventClickListerner{
-        fun onItemClicked(event: Event)
-        fun onLongItemClicked(event: Event, cardView: CardView)
+        fun onItemClicked(event: EventParticipants)
+        fun onLongItemClicked(event: EventParticipants, cardView: CardView)
     }
 
 

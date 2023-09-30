@@ -12,6 +12,10 @@ class EventRepository (private val eventDao: EventDao){
         eventDao.insertEvents(event)
     }
 
+    suspend fun retrieveId(eventId: Int) :Event{
+        return eventDao.getEventById(eventId)
+    }
+
     fun retrieve(): LiveData<List<Event>> {
         return eventDao.getAllEvents()
     }

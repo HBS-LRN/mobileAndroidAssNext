@@ -28,6 +28,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentManageEventBinding
 import com.example.bait2073mobileapplicationdevelopment.entities.Event
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventForm.EventFormViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserList.UserRatingViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.UserRating.UserRatingViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.squareup.picasso.Callback
@@ -36,7 +39,6 @@ import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
 
 class ManageEventFragment : Fragment() {
 
@@ -106,9 +108,6 @@ class ManageEventFragment : Fragment() {
 
 
         viewModelEventParticipants.getEventsPartSize(event_id)
-
-
-
 
         return binding.root
     }
@@ -190,10 +189,14 @@ class ManageEventFragment : Fragment() {
                 PICK_IMAGE_REQUEST -> {
                     val selectedImageUri = data?.data
                     if (selectedImageUri != null) {
-
-                        binding.eventImgAdmin.setImageURI(selectedImageUri)
-                        val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
-                        selectedImageBitmap = imageBitmap
+                        if (selectedImageUri.toString().endsWith(".jpg", true)) {
+                            binding.eventImgAdmin.setImageURI(selectedImageUri)
+                            val imageBitmap =
+                                MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
+                            selectedImageBitmap = imageBitmap
+                        } else {
+                            Toast.makeText(requireContext(), "Please select a JPG image.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
@@ -344,11 +347,15 @@ class ManageEventFragment : Fragment() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
     private fun initViewModel() {
+//        viewModel = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(EventFormViewModel::class.java)
+
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            EventFormViewModelFactory(requireActivity().application)
         ).get(EventFormViewModel::class.java)
-
 
     }
 
