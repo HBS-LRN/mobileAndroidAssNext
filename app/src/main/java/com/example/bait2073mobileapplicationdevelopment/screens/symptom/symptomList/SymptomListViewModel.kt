@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetSymptomDataService
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.entities.Disease
 import com.example.bait2073mobileapplicationdevelopment.repository.SymptomRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ class SymptomListViewModel(application: Application) :AndroidViewModel(applicati
         private val apiService = RetrofitClientInstance.retrofitInstance!!.create(GetSymptomDataService::class.java)
         var symptomListMut = MutableLiveData<List<Symptom?>>()
         var deleteSymptomLiveData: MutableLiveData<Symptom?> = MutableLiveData()
+    var specificSymptomLiveData: MutableLiveData<Symptom?> = MutableLiveData()
 
         val allSymptom : LiveData <List<Symptom>>
         val symptomListDataDao : LiveData<List<Symptom>>
@@ -34,6 +36,9 @@ class SymptomListViewModel(application: Application) :AndroidViewModel(applicati
         symptomListDataDao = repository.retrieve()
     }
 
+    fun getSpecificSymptomObservable(): MutableLiveData<Symptom?> {
+        return specificSymptomLiveData
+    }
 
     fun getDeleteSymptomObservable(): MutableLiveData<Symptom?> {
         return deleteSymptomLiveData
@@ -121,5 +126,26 @@ class SymptomListViewModel(application: Application) :AndroidViewModel(applicati
                 }
             }
         })
+    }
+
+    fun getSpecificSymptom(symptom_id:Int?):LiveData<Symptom?> {
+
+        apiService.getSymptom(symptom_id).enqueue(object : Callback<Symptom?> {
+            override fun onFailure(call: Call<Symptom?>, t: Throwable) {
+                Log.e("error", "?error")
+                specificSymptomLiveData.postValue(null)
+            }
+
+            override fun onResponse(call: Call<Symptom?>, response: Response<Symptom?>) {
+                if(response.isSuccessful) {
+                    Log.e("Response", "Response success")
+                    specificSymptomLiveData.postValue(response.body())
+                } else {
+                    Log.e("Response", "Response body empty")
+                    specificSymptomLiveData.postValue(null)
+                }
+            }
+        })
+        return specificSymptomLiveData
     }
 }

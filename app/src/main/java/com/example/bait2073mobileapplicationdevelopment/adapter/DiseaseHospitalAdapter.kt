@@ -2,6 +2,8 @@ package com.example.bait2073mobileapplicationdevelopment.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.bait2073mobileapplicationdevelopment.R
 import com.example.bait2073mobileapplicationdevelopment.data.DiseasedataClass
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseHospital_Room
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Hospital
 import com.example.bait2073mobileapplicationdevelopment.entities.Hospital
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseHospitalDataService
@@ -31,12 +34,14 @@ import java.net.URLEncoder
 
 class DiseaseHospitalAdapter (private val context : Context) : RecyclerView.Adapter<DiseaseHospitalAdapter.DiseaseHospitalViewHolder>() {
 
-    private val apiService = RetrofitClientInstance.retrofitInstance!!.create(
-        GetDiseaseHospitalDataService::class.java)
     private val apiService2 = RetrofitClientInstance.retrofitInstance!!.create(
         GetHospitalDataService::class.java)
     var diseaseHospitalList = mutableListOf<Disease_Hospital>()
     var fullList = mutableListOf<Disease_Hospital>()
+
+    var diseaseHospitalRoomList = mutableListOf<DiseaseHospital_Room>()
+    var fullRoomList = mutableListOf<DiseaseHospital_Room>()
+
     var hospitalAddress :String =""
     private var ctx: Context? = null
 
@@ -45,6 +50,14 @@ class DiseaseHospitalAdapter (private val context : Context) : RecyclerView.Adap
         fullList.addAll(newData)
         diseaseHospitalList.clear()
         diseaseHospitalList.addAll(fullList)
+        notifyDataSetChanged()
+    }
+
+    fun setRoomData(newData: List<DiseaseHospital_Room>) {
+        fullRoomList.clear()
+        fullRoomList.addAll(newData)
+        diseaseHospitalRoomList.clear()
+        diseaseHospitalRoomList.addAll(fullRoomList)
         notifyDataSetChanged()
     }
 
@@ -63,11 +76,13 @@ class DiseaseHospitalAdapter (private val context : Context) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: DiseaseHospitalViewHolder, position: Int) {
+        if(isNetworkAvailable(context)){
         val currentHospital = diseaseHospitalList[position]
         val hospitalId= currentHospital.hospital_id
         val position2 = position +1
         Log.i("diseaseHospitallist", "$diseaseHospitalList")
         holder.hospitalSeqNum.text = position2.toString()
+
         apiService2.getHospital(hospitalId).enqueue(object : Callback<Hospital> {
             override fun onResponse(call: Call<Hospital>, response: Response<Hospital>) {
                 if (response.isSuccessful) {
@@ -96,23 +111,23 @@ class DiseaseHospitalAdapter (private val context : Context) : RecyclerView.Adap
                 holder.diseaseHospitalName.text = "Unknown Hospital"
             }
         })
+        }else{
+            val currentHospitalRoom = diseaseHospitalRoomList[position]
+            val hospitalId= currentHospitalRoom.hospital_id
+            val position2 = position +1
+            Log.i("diseaseHospitalRoomlist", "$diseaseHospitalRoomList")
+            holder.hospitalSeqNum.text = position2.toString()
+            val hospitalName = currentHospitalRoom.hospital_name
+            hospitalAddress = currentHospitalRoom.hospital_address.toString()
+            val hospitalContact = currentHospitalRoom.hospital_contact
+            holder.diseaseHospitalName.text = hospitalName
+            holder.diseaseHospitalContact.text = hospitalContact
+        }
 
         holder.hospitalHowToGo.setOnClickListener{
             val hospitalAddress = hospitalAddress.replace(" ","+")
             Log.i("hospitaladdress", "$hospitalAddress")
-//            // Create a web URI for the hospital's location
-//            val mapUrl = "https://www.google.com/maps?q=$hospitalAddress"
-//            Log.i("hospitaladdressURL", "$mapUrl")
-//            // Create an intent with ACTION_VIEW and the geo URI
-//            val mapIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl))
-//            Log.i("mapIntent", "$mapIntent")
-//            // Check if there's an app that can handle this intent
-//            if (mapIntent.resolveActivity(context.packageManager) != null) {
-//                context.startActivity(mapIntent)
-//            } else {
-//                // Handle the case where no app can handle the intent
-//                Toast.makeText(context, "No app or browser available.", Toast.LENGTH_SHORT).show()
-//            }
+
             try {
                 val escapedQuery = URLEncoder.encode(hospitalAddress, "UTF-8")
                 val uri = Uri.parse("http://www.google.com/search?q=$escapedQuery")
@@ -127,6 +142,15 @@ class DiseaseHospitalAdapter (private val context : Context) : RecyclerView.Adap
 
     override fun getItemCount(): Int {
         return diseaseHospitalList.size
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
 }

@@ -1,11 +1,13 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.recipe.recipeForm
 
+import RecipeFormViewModelFactory
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -45,10 +47,12 @@ class RecipeFormFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //val user_id = intent.getStringExtra("user_id")
+
         binding = FragmentRecipeFormBinding.inflate(inflater, container, false)
 
-        initViewModel()
+        viewModel = ViewModelProvider(
+            this, RecipeFormViewModelFactory()
+        ).get(RecipeFormViewModel::class.java)
         createRecipeObservable()
         val args = RecipeFormFragmentArgs.fromBundle(requireArguments())
         val recipe_id = args.recipeId
@@ -75,8 +79,6 @@ class RecipeFormFragment: Fragment() {
     }
 
 
-    // Function to show a dialog for choosing between gallery and camera
-
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
@@ -91,23 +93,39 @@ class RecipeFormFragment: Fragment() {
             when (requestCode) {
                 PICK_IMAGE_REQUEST -> {
                     val selectedImageUri = data?.data
-                    if (selectedImageUri != null) {
+                    if (isImageValid(selectedImageUri)) {
                         binding.recipeImg.setImageURI(selectedImageUri)
                         val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
-                        selectedImageBitmap = imageBitmap // Store the selected image in the variable
+                        selectedImageBitmap = imageBitmap
+                    }else{
+                        Toast.makeText(requireContext(),"Invalid image format", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 CAPTURE_IMAGE_REQUEST -> {
                     val imageBitmap = data?.extras?.get("data") as Bitmap?
-                    // Handle the captured image bitmap (e.g., display it, store it, etc.)
+
                     if (imageBitmap != null) {
-                        selectedImageBitmap = imageBitmap // Store the captured image in the variable
+                        selectedImageBitmap = imageBitmap
                     }
                 }
             }
         }
     }
+
+    private fun isImageValid(imageUri: Uri?): Boolean {
+        if (imageUri == null) {
+            return false
+        }
+        val contentResolver = requireContext().contentResolver
+        val mimeType = contentResolver.getType(imageUri)
+
+        return when (mimeType) {
+            "image/jpeg", "image/jpg", "image/png" -> true
+            else -> false
+        }
+    }
+
     private fun loadRecipeData(recipe_id: Int?) {
         viewModel.getLoadRecipeObservable().observe(viewLifecycleOwner, Observer<Recipe?> {
             if (it != null) {
@@ -166,18 +184,10 @@ class RecipeFormFragment: Fragment() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    private fun initViewModel() {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(RecipeFormViewModel::class.java)
-
-    }
-
     private fun createRecipeObservable() {
         viewModel.getCreateRecipeObservable().observe(viewLifecycleOwner, Observer<Recipe?> {
             if (it == null) {
-                binding.layoutRecipeName.error = "Recipe Name Already Registered, Please Try Another Recipe Name"
+                Log.e("error", "error")
             } else {
                 showSuccessDialog()
 

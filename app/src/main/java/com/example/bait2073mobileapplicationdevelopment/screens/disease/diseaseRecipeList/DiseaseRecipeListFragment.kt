@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseRecipeList
 
+import DiseaseRecipeListViewModelFactory
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -39,9 +40,8 @@ class DiseaseRecipeListFragment : Fragment(), DiseaseRecipeListAdapter.DiseaseRe
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDiseaserecipeListBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            DiseaseRecipeListViewModel::class.java)
+        viewModel = ViewModelProvider(this, DiseaseRecipeListViewModelFactory(requireActivity().application))
+            .get(DiseaseRecipeListViewModel::class.java)
 
         // Observe disease Recipe list
         viewModel.getDiseaseRecipeListObservable().observe(viewLifecycleOwner, Observer<List<Disease_Recipe?>> { diseaseRecipeListResponse ->

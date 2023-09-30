@@ -1,5 +1,8 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseRecipeForm
 
+import DiseaseListViewModelFactory
+import DiseaseRecipeFormViewModelFactory
+import RecipeListViewModelFactory
 import android.R
 import android.app.Dialog
 import android.graphics.Color
@@ -42,19 +45,17 @@ class DiseaseRecipeFormFragment : Fragment() {
     ): View? {
 
         binding = FragmentDiseaserecipeFormBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(DiseaseRecipeFormViewModel::class.java)
+        viewModel = ViewModelProvider(this, DiseaseRecipeFormViewModelFactory())
+            .get(DiseaseRecipeFormViewModel::class.java)
         createDiseaseRecipeObservable()
-        diseaseViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(DiseaseListViewModel::class.java)
+
+        diseaseViewModel = ViewModelProvider(this, DiseaseListViewModelFactory(requireActivity().application))
+            .get(DiseaseListViewModel::class.java)
+
 
         recipeViewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            RecipeListViewModelFactory(requireActivity().application)
         ).get(RecipeListViewModel::class.java)
 
         val autoCompleteDiseaseTextView = binding.autoCompleteDiseaseTextView
@@ -71,13 +72,10 @@ class DiseaseRecipeFormFragment : Fragment() {
                     })
                 autoCompleteDiseaseTextView.setAdapter(adapter)
 
-                // Set an item click listener to get the selected disease and its ID
                 autoCompleteDiseaseTextView.setOnItemClickListener { _, _, position, _ ->
                     val selectedDisease = diseases[position]
                     selectedDiseaseId = selectedDisease?.id
 
-                    // Now you have the selected disease and its ID
-                    // You can use them as needed
                 }
             }
         })
@@ -89,12 +87,11 @@ class DiseaseRecipeFormFragment : Fragment() {
                     R.layout.simple_dropdown_item_1line,
                     recipes.map { it?.recipe_name })
                 autoCompleteRecipeTextView.setAdapter(adapter)
-                // Set an item click listener to get the selected recipe and its ID
+
                 autoCompleteRecipeTextView.setOnItemClickListener { _, _, position, _ ->
                     val selectedRecipe = recipes[position]
                     selectedRecipeId = selectedRecipe?.id
-                    // Now you have the selected recipe and its ID
-                    // You can use them as needed
+
                 }
             }
         })
@@ -138,7 +135,7 @@ class DiseaseRecipeFormFragment : Fragment() {
         viewModel.getCreateDiseaseRecipeObservable()
             .observe(viewLifecycleOwner, Observer<Disease_Recipe?> {
                 if (it == null) {
-                    binding.layoutDiseasesName.error = "Disease Recipe Already Exist"
+                    Log.e("error", "error")
                 } else {
                     showSuccessDialog()
 

@@ -1,5 +1,9 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseSymptomForm
 
+import DiseaseHospitalFormViewModelFactory
+import DiseaseListViewModelFactory
+import DiseaseSymptomFormViewModelFactory
+import SymptomListViewModelFactory
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -29,6 +33,8 @@ import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseDat
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseSymptomDataService
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetSymptomDataService
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.AdminFormViewModel
+import com.example.bait2073mobileapplicationdevelopment.screens.admin.AdminForm.AdminFormViewModelFactory
 import com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseList.DiseaseListViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseSymptomForm.DiseaseSymptomFormFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseSymptomForm.DiseaseSymptomFormViewModel
@@ -58,16 +64,15 @@ class DiseaseSymptomFormFragment : Fragment() {
 
         binding = FragmentDiseasesymptomFormBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            DiseaseSymptomFormViewModelFactory()
         ).get(DiseaseSymptomFormViewModel::class.java)
-        createDiseaseSymptomObservable()
-        diseaseViewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(DiseaseListViewModel::class.java)
 
-       symptomViewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(SymptomListViewModel::class.java)
+        createDiseaseSymptomObservable()
+        diseaseViewModel = ViewModelProvider(this, DiseaseListViewModelFactory(requireActivity().application))
+            .get(DiseaseListViewModel::class.java)
+
+       symptomViewModel =  ViewModelProvider(this, SymptomListViewModelFactory(requireActivity().application)
+       ).get(SymptomListViewModel::class.java)
 
         val autoCompleteDiseaseTextView = binding.autoCompleteDiseaseTextView
         val autoCompleteSymptomTextView = binding.autoCompleteSymptomTextView
@@ -97,8 +102,7 @@ class DiseaseSymptomFormFragment : Fragment() {
                 autoCompleteSymptomTextView.setOnItemClickListener { _, _, position, _ ->
                     val selectedSymptom = symptoms[position]
                    selectedSymptomId = selectedSymptom?.id
-                    // Now you have the selected symptom and its ID
-                    // You can use them as needed
+
                 }
             }
         })
@@ -142,7 +146,7 @@ class DiseaseSymptomFormFragment : Fragment() {
     private fun createDiseaseSymptomObservable() {
         viewModel.getCreateDiseaseSymptomObservable().observe(viewLifecycleOwner, Observer<Disease_Symptom?> {
             if (it == null) {
-                binding.layoutDiseasesName.error = "Disease Symptom Already Exist"
+                Log.e("error", "error")
             } else {
                 showSuccessDialog()
 
@@ -216,120 +220,4 @@ class DiseaseSymptomFormFragment : Fragment() {
         return isValidate
     }
 
-//
-//    private fun validateOnChangeUserName() {
-//        val eTextUserName = binding.eTextUserName
-//        val layoutUserName: TextInputLayout = binding.layoutUsername
-//        eTextUserName.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(
-//                charSequence: CharSequence?,
-//                start: Int,
-//                count: Int,
-//                after: Int
-//            ) {
-//                // This method is called to notify that the text is about to be changed.
-//            }
-//
-//            override fun onTextChanged(
-//                charSequence: CharSequence?,
-//                start: Int,
-//                before: Int,
-//                count: Int
-//            ) {
-//                // This method is called to notify that the text has been changed.
-//                val userNameText = charSequence.toString()
-//                val error = validUserName(userNameText)
-//
-//                if (error != null) {
-//                    layoutUserName.error = error
-//                } else {
-//                    layoutUserName.error = ""
-//                }
-//
-//            }
-//
-//            override fun afterTextChanged(editable: Editable?) {
-//                // This method is called to notify that the text has been changed and processed.
-//            }
-//        })
-//    }
-//
-//
-//    private fun validateOnChangeUserHeight() {
-//
-//        val layoutHeight: TextInputLayout = binding.layoutHeight
-//        val eTextUserHeight = binding.eTextHeight
-//
-//        eTextUserHeight.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(
-//                charSequence: CharSequence?,
-//                start: Int,
-//                count: Int,
-//                after: Int
-//            ) {
-//                // This method is called to notify that the text is about to be changed.
-//            }
-//
-//            override fun onTextChanged(
-//                charSequence: CharSequence?,
-//                start: Int,
-//                before: Int,
-//                count: Int
-//            ) {
-//                // This method is called to notify that the text has been changed.
-//                val userNameText = charSequence.toString()
-//                val error = validHeight(userNameText)
-//
-//                if (error != null) {
-//                    layoutHeight.error = error
-//                } else {
-//                    layoutHeight.error = ""
-//                }
-//
-//            }
-//
-//            override fun afterTextChanged(editable: Editable?) {
-//                // This method is called to notify that the text has been changed and processed.
-//            }
-//        })
-//    }
-//
-//    private fun validateOnChangeUserWeight() {
-//
-//        val layoutWeight: TextInputLayout = binding.layoutWeight
-//        val eTextUserWeight = binding.eTextWeight
-//
-//        eTextUserWeight.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(
-//                charSequence: CharSequence?,
-//                start: Int,
-//                count: Int,
-//                after: Int
-//            ) {
-//                // This method is called to notify that the text is about to be changed.
-//            }
-//
-//            override fun onTextChanged(
-//                charSequence: CharSequence?,
-//                start: Int,
-//                before: Int,
-//                count: Int
-//            ) {
-//                // This method is called to notify that the text has been changed.
-//                val userNameText = charSequence.toString()
-//                val error = validWeight(userNameText)
-//
-//                if (error != null) {
-//                    layoutWeight.error = error
-//                } else {
-//                    layoutWeight.error = ""
-//                }
-//
-//            }
-//
-//            override fun afterTextChanged(editable: Editable?) {
-//                // This method is called to notify that the text has been changed and processed.
-//            }
-//        })
-//    }
 }

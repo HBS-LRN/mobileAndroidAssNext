@@ -7,8 +7,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseDao
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseHospitalDao
+import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseHospitalRoomDao
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseRecipeDao
+import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseRecipeRoomDao
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseSymptomDao
+import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseSymptomRoomDao
 import com.example.bait2073mobileapplicationdevelopment.dao.EventDao
 import com.example.bait2073mobileapplicationdevelopment.dao.HospitalDao
 import com.example.bait2073mobileapplicationdevelopment.dao.PersonalizedWorkoutDao
@@ -19,6 +22,9 @@ import com.example.bait2073mobileapplicationdevelopment.dao.UserDao
 import com.example.bait2073mobileapplicationdevelopment.dao.UserPlanDao
 import com.example.bait2073mobileapplicationdevelopment.dao.UserPlanListDao
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseHospital_Room
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseRecipe_Room
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseSymptom_Room
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Hospital
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Symptom
@@ -35,7 +41,7 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Workout
 import com.example.bait2073mobileapplicationdevelopment.utilities.DateConverter
 
 
-@Database(entities = [User::class,PersonalizedWorkout::class,StartWorkout::class, Event::class,UserPlan::class,UserPlanList::class,Workout::class, Disease::class, Symptom::class, Disease_Symptom::class, Recipe::class, Disease_Recipe::class, Hospital::class, Disease_Hospital::class],version = 1,exportSchema = false)
+@Database(entities = [User::class,PersonalizedWorkout::class,StartWorkout::class, Event::class,UserPlan::class,UserPlanList::class,Workout::class, Disease::class, Symptom::class, Disease_Symptom::class, Recipe::class, Disease_Recipe::class, Hospital::class, Disease_Hospital::class, DiseaseHospital_Room::class,DiseaseRecipe_Room::class,DiseaseSymptom_Room::class],version = 1,exportSchema = false)
 @TypeConverters(DateConverter::class)
 abstract class HealthyLifeDatabase: RoomDatabase()  {
 
@@ -61,7 +67,6 @@ abstract class HealthyLifeDatabase: RoomDatabase()  {
     abstract fun startWorkoutDao(): StartWorkoutDao
 
     abstract fun userPlanDao(): UserPlanDao
-
     abstract fun userPlanListDao(): UserPlanListDao
     abstract fun symptomDao(): SymptomDao
     abstract fun diseaseDao(): DiseaseDao
@@ -71,4 +76,7 @@ abstract class HealthyLifeDatabase: RoomDatabase()  {
     abstract fun hospitalDao(): HospitalDao
     abstract fun diseaseHospitalDao(): DiseaseHospitalDao
     abstract fun eventDao(): EventDao
+    abstract fun diseaseSymptomRoomDao(): DiseaseSymptomRoomDao
+    abstract fun diseaseRecipeRoomDao(): DiseaseRecipeRoomDao
+    abstract fun diseaseHospitalRoomDao(): DiseaseHospitalRoomDao
 }

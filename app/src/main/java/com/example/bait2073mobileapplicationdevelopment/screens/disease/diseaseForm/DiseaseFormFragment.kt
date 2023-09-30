@@ -1,11 +1,14 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseForm
 
+import DiseaseFormViewModelFactory
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -16,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -39,14 +43,15 @@ class DiseaseFormFragment: Fragment() {
     private var selectedImageBitmap: Bitmap? = null
     private lateinit var dialog: Dialog
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDiseaseFormBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(DiseaseFormViewModel::class.java)
+
+        viewModel = ViewModelProvider(this, DiseaseFormViewModelFactory())
+            .get(DiseaseFormViewModel::class.java)
 
         createDiseaseObservable()
         val args = DiseaseFormFragmentArgs.fromBundle(requireArguments())
@@ -75,8 +80,6 @@ class DiseaseFormFragment: Fragment() {
     }
 
 
-    // Function to show a dialog for choosing between gallery and camera
-
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
@@ -91,17 +94,17 @@ class DiseaseFormFragment: Fragment() {
             when (requestCode) {
                 PICK_IMAGE_REQUEST -> {
                     val selectedImageUri = data?.data
-                    if (selectedImageUri != null) {
-
+                    if (isImageValid(selectedImageUri)) {
                         binding.diseaseImg.setImageURI(selectedImageUri)
                         val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
                         selectedImageBitmap = imageBitmap
+                    }else{
+                        Toast.makeText(requireContext(),"Invalid image format", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 CAPTURE_IMAGE_REQUEST -> {
                     val imageBitmap = data?.extras?.get("data") as Bitmap?
-                    // Handle the captured image bitmap (e.g., display it, store it, etc.)
                     if (imageBitmap != null) {
                         selectedImageBitmap = imageBitmap
                     }
@@ -163,7 +166,7 @@ class DiseaseFormFragment: Fragment() {
     private fun createDiseaseObservable() {
         viewModel.getCreateDiseaseObservable().observe(viewLifecycleOwner, Observer<Disease?> {
             if (it == null) {
-                binding.layoutDiseaseName.error = "Disease Name Already Registered, Please Try Another Disease Name."
+                Log.e("error", "error")
             } else {
                 showSuccessDialog()
 
@@ -220,19 +223,29 @@ class DiseaseFormFragment: Fragment() {
         return null
     }
 
+    private fun isImageValid(imageUri: Uri?): Boolean {
+        if (imageUri == null) {
+            return false
+        }
+        val contentResolver = requireContext().contentResolver
+        val mimeType = contentResolver.getType(imageUri)
+
+        return when (mimeType) {
+            "image/jpeg", "image/jpg", "image/png" -> true
+            else -> false
+        }
+    }
+
     private fun validateForm(): Boolean {
 
-        //get the input
         val diseaseNameText = binding.eTextDiseaseName.text.toString()
         val diseaseDescriptionText = binding.eTextDiseaseDescription.text.toString()
         val diseaseCausesText = binding.eTextDiseaseCauses.text.toString()
 
-        //get the layout component
         val layoutDiseaseName: TextInputLayout = binding.layoutDiseaseName
         val layoutDiseaseDescription: TextInputLayout = binding.layoutDiseaseDescription
         val layoutDiseaseCauses: TextInputLayout = binding.layoutDiseaseCauses
 
-        //get the error
         val diseaseNameError = validDiseaseName(diseaseNameText)
         val diseaseDescriptionError = validDiseaseDescription(diseaseDescriptionText)
         val diseaseCausesError = validDiseaseCauses(diseaseCausesText)

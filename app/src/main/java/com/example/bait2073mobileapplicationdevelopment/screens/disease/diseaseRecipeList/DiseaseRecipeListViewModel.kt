@@ -11,8 +11,12 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseRecipeDataService
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseRecipe_Room
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseSymptom_Room
 import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseRecipeRepository
+import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseRecipeRoomRepository
 import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseSymptomRepository
+import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseSymptomRoomRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,10 +35,16 @@ class DiseaseRecipeListViewModel (application: Application) : AndroidViewModel(a
 
     val allDiseaseRecipe : LiveData<List<Disease_Recipe>>
     val diseaseRecipeListDataDao : LiveData<List<Disease_Recipe>>
+    val diseaseRecipeDataFromRoomDB : LiveData<List<DiseaseRecipe_Room>>
+
     private val repository : DiseaseRecipeRepository
+    private val roomRepository : DiseaseRecipeRoomRepository
     init{
         val dao = HealthyLifeDatabase.getDatabase(application).diseaseRecipeDao()
         repository = DiseaseRecipeRepository(dao)
+        val dao2 = HealthyLifeDatabase.getDatabase(application).diseaseRecipeRoomDao()
+        roomRepository = DiseaseRecipeRoomRepository(dao2)
+        diseaseRecipeDataFromRoomDB = roomRepository.allDiseaseRecipesRoom
         allDiseaseRecipe = repository.allDiseaseRecipes
         diseaseRecipeListDataDao = repository.retrieve()
     }
@@ -109,9 +119,44 @@ class DiseaseRecipeListViewModel (application: Application) : AndroidViewModel(a
         }
 
     }
+    fun insertDiseaseRecipeRoom(diseaseRecipeRoom: DiseaseRecipe_Room)= viewModelScope.launch(Dispatchers.IO){
+        roomRepository.insert(diseaseRecipeRoom)
+    }
+
+    fun insertDiseaseRecipeRoomDataIntoRoomDb(diseaseRecipeRoom: DiseaseRecipe_Room) {
+        viewModelScope.launch {
+            this.let {
+                try {
+                    insertDiseaseRecipeRoom(
+                        DiseaseRecipe_Room(
+                            id = diseaseRecipeRoom.id,
+                            disease_id = diseaseRecipeRoom.disease_id,
+                            disease_name = diseaseRecipeRoom.disease_name,
+                            recipe_id = diseaseRecipeRoom.recipe_id,
+                            recipe_name = diseaseRecipeRoom.recipe_name,
+                            recipe_image = diseaseRecipeRoom.recipe_image,
+                            recipe_description = diseaseRecipeRoom.recipe_description,
+                            recipe_servings =  diseaseRecipeRoom.recipe_servings
+                        )
+                    )
+                }catch (e: Exception) {
+                    Log.e("InsertDataIntoRoomDb", "Error inserting data into Room Database: ${e.message}", e)
+                }
+            }
+        }
+
+    }
+
+
     private fun removeDiseaseRecipeFromLocalDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAll()
+        }
+    }
+
+    fun removeDiseaseRecipeRoomFromLocalDatabase() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.deleteAll()
         }
     }
 

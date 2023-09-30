@@ -11,7 +11,9 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Hospita
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseHospitalDataService
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseHospital_Room
 import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseHospitalRepository
+import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseHospitalRoomRepository
 import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseRecipeRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +33,18 @@ class DiseaseHospitalListViewModel (application: Application) : AndroidViewModel
 
     val allDiseaseHospital : LiveData<List<Disease_Hospital>>
     val diseaseHospitalListDataDao : LiveData<List<Disease_Hospital>>
+    val diseaseHospitalDataFromRoomDB : LiveData<List<DiseaseHospital_Room>>
+
     private val repository : DiseaseHospitalRepository
+    private val roomRepository : DiseaseHospitalRoomRepository
+
     init{
         val dao = HealthyLifeDatabase.getDatabase(application).diseaseHospitalDao()
         repository = DiseaseHospitalRepository(dao)
+        val dao2 = HealthyLifeDatabase.getDatabase(application).diseaseHospitalRoomDao()
+        roomRepository = DiseaseHospitalRoomRepository(dao2)
         allDiseaseHospital = repository.allDiseaseHospitals
+        diseaseHospitalDataFromRoomDB = roomRepository.allDiseaseHospitalsRoom
         diseaseHospitalListDataDao = repository.retrieve()
     }
 
@@ -60,7 +69,7 @@ class DiseaseHospitalListViewModel (application: Application) : AndroidViewModel
             ) {
                 if (response.isSuccessful) {
                     val diseaseHospitalLists = response.body()
-//                        Log.e("gg", "Response not successful, code: ${diseaseHospitalLists}")
+
                     if (!diseaseHospitalLists.isNullOrEmpty()) {
                         diseaseHospitalListMut.postValue(response.body())
                         insertDiseaseHospitalDataIntoRoomDb(diseaseHospitalLists)
@@ -113,6 +122,12 @@ class DiseaseHospitalListViewModel (application: Application) : AndroidViewModel
         }
     }
 
+    private fun removeDiseaseHospitalRoomFromLocalDatabase(id: Int?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.deleteOne(id!!)
+        }
+    }
+
     fun deleteDiseaseHospital(diseaseHospital: Disease_Hospital) {
 
         apiService.deleteDiseaseHospital(diseaseHospital.id ?: 0)
@@ -130,6 +145,7 @@ class DiseaseHospitalListViewModel (application: Application) : AndroidViewModel
                         Log.e("Response", "Response body empty")
                         deleteDiseaseHospitalLiveData.postValue(response.body())
                         removeDiseaseHospitalFromLocalDatabase()
+                        removeDiseaseHospitalRoomFromLocalDatabase(diseaseHospital.id)
                     } else {
                         Log.e("Response", "Response body empty")
                         deleteDiseaseHospitalLiveData.postValue(null)
