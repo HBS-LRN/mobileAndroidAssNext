@@ -145,7 +145,7 @@ class DiseaseRecipeListFragment : Fragment(), DiseaseRecipeListAdapter.DiseaseRe
             if (deletedDiseaseRecipe == null) {
                 Toast.makeText(requireContext(), "Cannot Delete Disease Recipe", Toast.LENGTH_SHORT).show()
             } else {
-                showSuccessDialog()
+                Toast.makeText(requireContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show()
                 viewModel.getDiseaseRecipeList()
 
             }

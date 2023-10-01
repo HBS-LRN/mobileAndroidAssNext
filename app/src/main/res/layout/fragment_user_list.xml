@@ -50,7 +50,7 @@
                 android:layout_gravity="center"
                 android:fontFamily="@font/poppins_bold"
                 android:gravity="center"
-                android:text="Add Customer"
+                android:text="Add User"
                 android:textColor="#fff"
                 android:textSize="19dp"
                 android:textStyle="bold" />

@@ -147,7 +147,7 @@
                 app:boxBackgroundMode="outline"
                 app:endIconMode="clear_text"
                 app:endIconTint="@color/lavender"
-                app:placeholderText="ex: abc@gmail.com"
+                app:placeholderText="ex: Details"
                 app:startIconDrawable="@drawable/baseline_short_text_24"
                 app:startIconTint="@color/lavender">
 

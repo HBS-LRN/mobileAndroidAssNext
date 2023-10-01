@@ -145,7 +145,7 @@ class DiseaseHospitalListFragment : Fragment(), DiseaseHospitalListAdapter.Disea
             if (deletedDiseaseHospital == null) {
                 Toast.makeText(requireContext(), "Cannot Delete Disease Hospital", Toast.LENGTH_SHORT).show()
             } else {
-                showSuccessDialog()
+                Toast.makeText(requireContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show()
                 viewModel.getDiseaseHospitalList()
 
             }

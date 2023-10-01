@@ -198,7 +198,7 @@ class DiseaseSymptomListFragment : Fragment(), DiseaseSymptomListAdapter.Disease
             if (deletedDiseaseSymptom == null) {
                 Toast.makeText(requireContext(), "Cannot Delete Disease Symptom", Toast.LENGTH_SHORT).show()
             } else {
-                showSuccessDialog()
+                Toast.makeText(requireContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show()
                 viewModel.getDiseaseSymptomList()
 
             }

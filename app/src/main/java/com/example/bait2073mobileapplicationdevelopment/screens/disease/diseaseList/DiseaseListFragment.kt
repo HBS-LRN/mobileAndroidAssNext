@@ -148,7 +148,7 @@ class DiseaseListFragment : Fragment(),DiseaseListAdapter.DiseaseClickListener, 
             if (deletedDisease == null) {
                 Toast.makeText(requireContext(), "Cannot Delete Disease", Toast.LENGTH_SHORT).show()
             } else {
-                showSuccessDialog()
+                Toast.makeText(requireContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show()
                 viewModel.getDiseaseList()
 
             }

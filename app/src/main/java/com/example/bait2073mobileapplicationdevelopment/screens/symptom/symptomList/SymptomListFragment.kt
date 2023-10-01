@@ -150,7 +150,7 @@ class SymptomListFragment: Fragment(),SymptomListAdapter.SymptomClickListener, P
             if (deletedSymptom == null) {
                 Toast.makeText(requireContext(), "Cannot Delete Symptom", Toast.LENGTH_SHORT).show()
             } else {
-                showSuccessDialog()
+                Toast.makeText(requireContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show()
                 viewModel.getSymptomList()
 
             }
