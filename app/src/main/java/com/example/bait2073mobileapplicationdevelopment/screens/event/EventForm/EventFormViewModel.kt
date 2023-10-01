@@ -23,7 +23,6 @@ import com.example.bait2073mobileapplicationdevelopment.entities.EventParticipan
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetEventDataService
 import com.example.bait2073mobileapplicationdevelopment.repository.EventRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
-import com.example.bait2073mobileapplicationdevelopment.screens.event.EventNotificationReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
