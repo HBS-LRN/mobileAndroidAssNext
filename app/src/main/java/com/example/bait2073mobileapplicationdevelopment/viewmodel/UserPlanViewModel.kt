@@ -3,9 +3,12 @@ package com.example.bait2073mobileapplicationdevelopment.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
 import com.example.bait2073mobileapplicationdevelopment.entities.UserPlan
 import com.example.bait2073mobileapplicationdevelopment.repository.UserPlanRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class UserPlanViewModel(application: Application, private val repository: UserPlanRepository) : AndroidViewModel(application) {
@@ -41,6 +44,9 @@ class UserPlanViewModel(application: Application, private val repository: UserPl
     // Function to update a user plan's name
     suspend fun updateUserPlan(userPlan: UserPlan) {
         userPlanRepository.updateUserPlan(userPlan)
+    }
+    fun clearWorkout() = viewModelScope.launch(Dispatchers.IO) {
+        userPlanRepository.clearWorkout()
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.workout
 
 import UserPlanListAdapter
+import UserPlanListModel
 import UserPlanViewModelFactory
 import android.app.AlertDialog
 import android.app.Dialog
@@ -51,8 +52,8 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
     private lateinit var binding: FragmentMyTrainListBinding
     lateinit var  roomDBviewModel:UserPlanViewModel
     lateinit var selectedPlan: UserPlan
-    private lateinit var dialog: Dialog
-
+//    lateinit var userPlanListRoomViewModel: UserPlanListModel
+//    lateinit var userPlanListViewModel:userrPlanWorkoutViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,12 +77,7 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
 
     }
 
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager =
-            requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected
-    }
+
 
     private fun showPlanNameDialog() {
         val builder = AlertDialog.Builder(requireContext())
@@ -135,43 +131,15 @@ class MyTrainList : Fragment(), UserPlanListAdapter.UserPlanClickListener, Popup
             } else {
                 Log.e("create success","create success")
 
-
                 val action =
                     MyTrainListDirections.actionMyTrainListToAddPlanLIst(it.id!!)
                 this.findNavController().navigate(action)
 
             }
         })
+
     }
 
-
-
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        val planNameEditText = view.findViewById<EditText>(R.id.PlanNameTextField)
-//        val addPlanBtn = view.findViewById<Button>(R.id.addPlanbtn)
-//        binding.ActionBtn.setOnClickListener {
-//            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_add_plan_pop_up, null)
-//            val dialog = AlertDialog.Builder(requireContext())
-//                .setView(dialogView)
-//                .create()
-//
-//            // Handle "Add Plan" button click inside the dialog
-//            addPlanBtn.setOnClickListener {
-//                val planName = planNameEditText.text.toString()
-//
-//                if (planName.isNotEmpty()) {
-//                    // Handle the planName as needed
-//                    Log.e("value", planName)
-//                    dialog.dismiss()
-//                } else {
-//                    Toast.makeText(requireContext(), "Plan name is empty", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            dialog.show()
-//        }
-//    }
 private fun searchPlan() {
     Log.e("TestSearch","searchPlan")
     binding.searchPlanView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -209,84 +177,66 @@ private fun searchPlan() {
     }
 
     private fun initRecyclerView() {
-
         val userData = retrieveUserDataFromSharedPreferences(requireContext())
         val userId = userData?.first!!
-        val isNetworkAvailable = isNetworkAvailable()
+
         binding.recycleView.setHasFixedSize(true)
         binding.recycleView.layoutManager = StaggeredGridLayoutManager(1, LinearLayout.VERTICAL)
-//        recyclerViewAdapter = UserPlanListAdapter(requireContext(), this)
+
         recyclerViewAdapter = UserPlanListAdapter(requireContext(), this)
         binding.recycleView.adapter = recyclerViewAdapter
-        Log.e("LostConnectCheck","$isNetworkAvailable")
-        if(isNetworkAvailable){
-            Log.e("LostConnect","$isNetworkAvailable")
-            roomDBviewModel.getUserPlansByUserId(userId).observe(/* owner = */ viewLifecycleOwner, /* observer = */
-                Observer { userPlans ->
-                // Handle the data retrieved from the local database
-                recyclerViewAdapter.setData(userPlans)
-                recyclerViewAdapter.notifyDataSetChanged()
-            })
-        }
 
-        //recyclerViewAdapter.setData() // Replace 'yourUserPlanListData' with your actual data
-//        recyclerViewAdapter.notifyDataSetChanged()
+
 
     }
+    fun clearUserPlandDb() {
+        roomDBviewModel.clearWorkout()
 
+    }
     private fun initViewModel() {
-
 
         val userData = retrieveUserDataFromSharedPreferences(requireContext())
         val userId = userData?.first!!
-        val factory = MyTrainViewModelFactory()
-        viewModel = ViewModelProvider(this, factory).get(MyTrainViewModel::class.java)
+
+        viewModel = ViewModelProvider(this, MyTrainViewModelFactory(requireActivity().application)).get(MyTrainViewModel::class.java)
+
         roomDBviewModel  = ViewModelProvider(this, UserPlanViewModelFactory(requireActivity().application)).get(UserPlanViewModel::class.java)
+
         viewModel.getUserPlanObserverable()
             .observe(viewLifecycleOwner, Observer<List<UserPlan?>> { userListResponse ->
                 if (userListResponse == null) {
                     Toast.makeText(requireContext(), "no result found...", Toast.LENGTH_LONG).show()
                 } else {
-//                recyclerViewAdapter.updateList(it.toList().get(1))
+
                     val userPlanList = userListResponse.filterNotNull().toMutableList()
                     Log.i("foyooooo", "$userPlanList")
 
                     recyclerViewAdapter.updateUserPlanList(userPlanList)
                     recyclerViewAdapter.setData(userPlanList)
+                    clearUserPlandDb()
                     insertDataIntoRoomDb(userPlanList)
                     recyclerViewAdapter.notifyDataSetChanged()
-
                 }
             })
 
         Log.e("user", "$userId")
         viewModel.getPlan(userId)
+
     }
 
-//    override fun onItemClicked(userPlan: UserPlan, userPlanList: UserPlanList) {
-//        val action = MyTrainListDirections.actionMyTrainListToAddPlanLIst()
-//        this.findNavController().navigate(action)
-//    }
-//
-//    override fun OnLongItemClicked(
-//        userPlan: UserPlan,
-//    userPlanList: UserPlanList,
-//    cardView: CardView
-//    ) {
-//        selectedPlanList = userPlanList
-//        selectedPlan = userPlan
-//        popUpDisplay(cardView)
-//    }
 fun insertDataIntoRoomDb(userPlan: List<UserPlan>) {
     try {
+        // Create a copy of the list to avoid ConcurrentModificationException
+        val userPlanCopy = ArrayList(userPlan)
+
         // Launch a coroutine to perform the database operation
         CoroutineScope(Dispatchers.IO).launch {
-            for (userPlanList in userPlan) {
+            for (userPlanList in userPlanCopy) {
                 Log.d("InsertDataIntoRoomDb", "Inserting workout with ID: ${userPlanList}")
                 roomDBviewModel.insertUserPlan(
                     UserPlan(
                         id = userPlanList.id,
-                        user_id= userPlanList.user_id,
+                        user_id = userPlanList.user_id,
                         plan_name = userPlanList.plan_name
                     )
                 )
@@ -312,6 +262,7 @@ fun insertDataIntoRoomDb(userPlan: List<UserPlan>) {
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         val userData = retrieveUserDataFromSharedPreferences(requireContext())
         val userId = userData?.first!!
+
         if (item?.itemId == R.id.delete_note) {
 
             viewModel.deleteUserPlan(selectedPlan.id)
@@ -323,10 +274,6 @@ fun insertDataIntoRoomDb(userPlan: List<UserPlan>) {
     }
 
     override fun onItemClicked(userPlan: UserPlan) {
-//        // Start the new activity here
-//        val intent = Intent(requireContext(), userPlanWorkoutShow::class.java)
-//        intent.putExtra("userPlanList", userPlan.id)
-//        startActivity(intent)
         val action = MyTrainListDirections.actionMyTrainListToUserPlanWorkoutShow(userPlan.id!!)
         this.findNavController().navigate(action)
     }
@@ -335,8 +282,6 @@ fun insertDataIntoRoomDb(userPlan: List<UserPlan>) {
         selectedPlan = userPlan
         popUpDisplay(cardView)
     }
-
-
 
 
 }

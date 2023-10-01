@@ -41,7 +41,7 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
     lateinit var recyclerViewAdapter: userPlanWorkoutShowAdapter
     lateinit var viewModel: userrPlanWorkoutViewModel
     lateinit var viewModelPlan: MyTrainViewModel
-    lateinit var viewModelRoom: UserPlanListModel
+//    lateinit var viewModelRoom: UserPlanListModel
     private lateinit var binding: FragmentUserPlanWorkoutShowBinding
     lateinit var selectedPlanList: UserPlanList
 
@@ -79,10 +79,7 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
 //            findNavController().navigate(R.id.)
 //
 //        }
-        viewModelRoom = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(UserPlanListModel::class.java)
+
 
         return binding.root
     }
@@ -117,12 +114,12 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
         val args = userPlanWorkoutShowArgs.fromBundle(requireArguments())
         val user_plan_id = args.userPlanId
         Log.e("TestUserPlanID","$user_plan_id")
-        viewModel = ViewModelProvider(
-            this,
-            userPlanWorkoutViewModelFactory()
-        ).get(userrPlanWorkoutViewModel::class.java)
-        viewModelPlan = ViewModelProvider(this, MyTrainViewModelFactory()).get(MyTrainViewModel::class.java)
-
+        viewModel = ViewModelProvider(this, userPlanWorkoutViewModelFactory(requireActivity().application)).get(userrPlanWorkoutViewModel::class.java)
+        viewModelPlan = ViewModelProvider(this, MyTrainViewModelFactory(requireActivity().application)).get(MyTrainViewModel::class.java)
+//        viewModelRoom = ViewModelProvider(
+//            this,
+//            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+//        ).get(UserPlanListModel::class.java)
 
         viewModel.getWorkoutListObserverable()
             .observe(viewLifecycleOwner, Observer<List<UserPlanList?>> { userPlanListResponse ->
@@ -136,11 +133,11 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
                     recyclerViewAdapter.notifyDataSetChanged()
 
 //                    clearUserPlandDb()
-                    insertDataIntoRoomDb(workoutList)
+//                    insertDataIntoRoomDb(workoutList)
                 }
             })
-
         viewModel.getUserPlanWorkoutList(user_plan_id)
+
     }
 
     private fun showEditUserPlanNameDialog() {
@@ -191,43 +188,6 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
 
     }
 
-    fun insertDataIntoRoomDb(userPlanList: List<UserPlanList>) {
-
-
-        try {
-            for (userPlanWorkout in userPlanList) {
-                Log.d("InsertDataIntoRoomDb", "Inserting workout with ID: ${userPlanWorkout}")
-                viewModelRoom.insertUserPlanList(
-                    UserPlanList(
-                        id = userPlanWorkout.id,
-                        userPlanId= userPlanWorkout.userPlanId,
-                        workoutId = userPlanWorkout.workoutId,
-                        name = userPlanWorkout.name,
-                        userId= userPlanWorkout.userId,
-                        description = userPlanWorkout.description,
-                        link = userPlanWorkout.link,
-                        gifimage = userPlanWorkout.gifimage,
-                        calorie = userPlanWorkout.calorie,
-                        bmi_status = userPlanWorkout.bmi_status
-
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            Log.e(
-                "InsertDataIntoRoomDb",
-                "Error inserting data into Room Database: ${e.message}",
-
-                )
-        }
-
-
-    }
-
-    fun clearUserPlandDb() {
-        viewModelRoom.clearWorkout()
-
-    }
 
     private fun retrieveUserDataFromSharedPreferences(context: Context): Pair<Int, String>? {
         val sharedPreferences: SharedPreferences =
@@ -248,6 +208,7 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1000) {
+
             viewModel.getWorkoutListObserverable()
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -286,38 +247,11 @@ class userPlanWorkoutShow : Fragment(), userPlanWorkoutShowAdapter.WorkoutClickL
                 Log.e("API Response", "Response body is Fail")
             }
         })
-//        val intent = Intent(requireContext(), WorkoutDetailsActivity::class.java)
-//        intent.putExtra("workout", userPlanList)
-//        startActivity(intent)
+
 
     }
 
 
-//    private fun popUpDisplay(cardView: CardView) {
-//
-//        val popup = PopupMenu(requireContext(), cardView)
-//        popup.setOnMenuItemClickListener(this)
-//        popup.inflate(R.menu.pop_up_menu)
-//        popup.show()
-//
-//    }
-//
-//    override fun onMenuItemClick(item: MenuItem?): Boolean {
-//        val userData = retrieveUserDataFromSharedPreferences(requireContext())
-//        val userId = userData?.first!!
-//        if (item?.itemId == R.id.delete_note) {
-//
-//            viewModel.deleteUserPlanList(selectedPlanList.id)
-//            val action =
-//                userPlanWorkoutShowDirections.actionUserPlanWorkoutShowToMyTrainList()
-//            this.findNavController().navigate(action)
-//        }
-//        return false
-//    }
-//    override fun OnLongItemClicked(userPlanList: UserPlanList, cardView: CardView) {
-//        selectedPlanList = userPlanList
-//        popUpDisplay(cardView)
-//    }
 
 
 }

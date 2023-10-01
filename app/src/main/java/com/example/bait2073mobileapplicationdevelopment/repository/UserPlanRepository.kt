@@ -31,4 +31,8 @@ class UserPlanRepository(private val userPlanDao: UserPlanDao) {
     suspend fun getUserPlansByUserId(plan_name: String){
         userPlanDao.getUserPlansByName(plan_name)
     }
+
+    suspend fun clearWorkout() {
+        userPlanDao.clearDb()
+    }
 }

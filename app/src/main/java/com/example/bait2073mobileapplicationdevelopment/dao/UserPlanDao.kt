@@ -23,6 +23,9 @@ interface UserPlanDao {
     @Delete
     fun deleteUserPlan(userplan:UserPlan)
 
+    @Query("DELETE FROM user_plan")
+    fun clearDb()
+
     @Update
     fun updateUserPlan(userplan:UserPlan)
 
