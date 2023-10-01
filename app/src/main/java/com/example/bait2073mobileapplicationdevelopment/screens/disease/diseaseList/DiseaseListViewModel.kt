@@ -12,6 +12,7 @@ import com.example.bait2073mobileapplicationdevelopment.entities.Hospital
 import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
 import com.example.bait2073mobileapplicationdevelopment.interfaces.GetDiseaseDataService
 import com.example.bait2073mobileapplicationdevelopment.database.HealthyLifeDatabase
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseSymptom_Room
 import com.example.bait2073mobileapplicationdevelopment.repository.DiseaseRepository
 import com.example.bait2073mobileapplicationdevelopment.repository.HospitalRepository
 import com.example.bait2073mobileapplicationdevelopment.retrofitclient.RetrofitClientInstance
@@ -30,6 +31,8 @@ class DiseaseListViewModel(application: Application) : AndroidViewModel(applicat
 
     val allDisease : LiveData<List<Disease>>
     val diseaseListDataDao : LiveData<List<Disease>>
+
+
     private val repository : DiseaseRepository
     init{
         val dao = HealthyLifeDatabase.getDatabase(application).diseaseDao()
@@ -105,7 +108,7 @@ class DiseaseListViewModel(application: Application) : AndroidViewModel(applicat
         }
 
     }
-    private fun removeHospitalFromLocalDatabase() {
+     fun removeDiseaseFromLocalDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAll()
         }
@@ -122,7 +125,7 @@ class DiseaseListViewModel(application: Application) : AndroidViewModel(applicat
                 if(response.isSuccessful) {
                     Log.e("Response", "Response body empty")
                     deleteDiseaseLiveData.postValue(response.body())
-                    removeHospitalFromLocalDatabase()
+                    removeDiseaseFromLocalDatabase()
                 } else {
                     Log.e("Response", "Response body empty")
                     deleteDiseaseLiveData.postValue(null)
@@ -141,7 +144,7 @@ class DiseaseListViewModel(application: Application) : AndroidViewModel(applicat
 
             override fun onResponse(call: Call<Disease?>, response: Response<Disease?>) {
                 if(response.isSuccessful) {
-                    Log.e("Response", "Response body empty")
+                    Log.e("Response", "Response sucess")
                    specificDiseaseLiveData.postValue(response.body())
                 } else {
                     Log.e("Response", "Response body empty")

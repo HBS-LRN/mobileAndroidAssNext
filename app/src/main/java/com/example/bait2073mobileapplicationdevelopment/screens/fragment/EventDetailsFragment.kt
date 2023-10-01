@@ -10,7 +10,10 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.UnderlineSpan
@@ -42,6 +45,7 @@ import com.example.bait2073mobileapplicationdevelopment.screens.admin.EventForm.
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm.EventFormViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventForm.ManageEventFragmentDirections
 import com.example.bait2073mobileapplicationdevelopment.screens.event.EventParticipants.EventParticipantsViewModelFactory
+import com.example.bait2073mobileapplicationdevelopment.screens.event.InternetConnectionError
 import com.example.bait2073mobileapplicationdevelopment.screens.eventParticipants.EventParticipantsParticipants.EventParticipantsViewModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -83,6 +87,7 @@ class EventDetailsFragment : Fragment() {
         }
 
 
+
         viewModel.observeCountdown(viewLifecycleOwner, Observer { countdownValue ->
             binding.txtStatus.text = countdownValue
 
@@ -95,13 +100,20 @@ class EventDetailsFragment : Fragment() {
         }
 
         binding.submitButton.setOnClickListener{
-            if(args.joined){
-                deleteEventParticipantsData()
+            if(!checkForInternet(requireContext())){
+                val internetConnectionError = InternetConnectionError(requireContext())
+                internetConnectionError.showLostInternetDialog()
             }else{
-                addEventParticipantsData()
+                if(args.joined){
+                    deleteEventParticipantsData()
+                }else{
+                    addEventParticipantsData()
+                }
             }
 
+
         }
+
 
 
         return binding.root
@@ -240,6 +252,8 @@ class EventDetailsFragment : Fragment() {
 
     }
 
+
+
 //    private fun loadEventParticipantsData() {
 //        viewModelUser.getLoadUserObservable().observe(viewLifecycleOwner, Observer<User?> {
 //            if (it != null) {
@@ -304,6 +318,8 @@ class EventDetailsFragment : Fragment() {
                 loadUserWhoMadeEventData(event.user_id)
 
                 viewModel.startCountdown(event.date.toString())
+//                viewModel.startCountdown(event.date.toString(),requireContext())
+
                 val eventImageView = binding.itemImage
 
                 binding.getDestinationText.setOnClickListener {
@@ -388,4 +404,34 @@ class EventDetailsFragment : Fragment() {
 
 
     }
+
+
+    private fun checkForInternet(context: Context?): Boolean {
+
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            val network = connectivityManager.activeNetwork ?: return false
+
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            return when {
+
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
+    }
+
+
 }

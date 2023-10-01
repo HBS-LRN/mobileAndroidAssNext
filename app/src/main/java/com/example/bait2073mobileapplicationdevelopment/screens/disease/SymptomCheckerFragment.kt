@@ -1,6 +1,7 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease
 
 
+import SymptomListViewModelFactory
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -37,20 +38,15 @@ class SymptomCheckerFragment : Fragment(), DiseaseCheckerAdapter.SymptomClickLis
     private lateinit var binding: FragmentSymptomsSearchBinding
     private lateinit var viewModel: SymptomListViewModel
     private lateinit var adapter: DiseaseCheckerAdapter
-    lateinit var selectedSymptom: Symptom
-    private lateinit var dialog: Dialog
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSymptomsSearchBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(
-            SymptomListViewModel::class.java
-        )
+        viewModel =  ViewModelProvider(this, SymptomListViewModelFactory(requireActivity().application)
+        ).get(SymptomListViewModel::class.java)
 
         viewModel.getSymptomListObservable()
             .observe(viewLifecycleOwner, Observer<List<Symptom?>> { symptomListResponse ->

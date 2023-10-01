@@ -32,7 +32,6 @@ class DiseaseHospitalListAdapter  (private val context : Context, val listener: 
     var fullList = mutableListOf<Disease_Hospital>()
     val diseaseList = mutableListOf<DiseasedataClass>()
 
-    private val diseaseNameMap = mutableMapOf<Int, String>()
     private var ctx: Context? = null
 
     fun setData(newData: List<Disease_Hospital>) {

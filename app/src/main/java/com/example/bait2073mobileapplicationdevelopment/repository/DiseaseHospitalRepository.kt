@@ -3,8 +3,7 @@ package com.example.bait2073mobileapplicationdevelopment.repository
 import androidx.lifecycle.LiveData
 import com.example.bait2073mobileapplicationdevelopment.dao.DiseaseHospitalDao
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Hospital
-import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Recipe
-import com.example.bait2073mobileapplicationdevelopment.entities.Symptom
+
 
 class DiseaseHospitalRepository (private val diseaseHospitalDao: DiseaseHospitalDao) {
 

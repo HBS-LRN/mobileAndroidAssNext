@@ -1,5 +1,8 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseHospitalForm
 
+import DiseaseHospitalFormViewModelFactory
+import DiseaseListViewModelFactory
+import HospitalListViewModelFactory
 import android.R
 import android.app.Dialog
 import android.graphics.Color
@@ -18,6 +21,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.bait2073mobileapplicationdevelopment.databinding.FragmentDiseasehospitalFormBinding
+import com.example.bait2073mobileapplicationdevelopment.entities.DiseaseHospital_Room
 import com.example.bait2073mobileapplicationdevelopment.entities.Disease_Hospital
 import com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseList.DiseaseListViewModel
 import com.example.bait2073mobileapplicationdevelopment.screens.disease.diseaseHospitalForm.DiseaseHospitalFormFragmentDirections
@@ -33,7 +37,11 @@ class DiseaseHospitalFormFragment : Fragment() {
     private lateinit var binding: FragmentDiseasehospitalFormBinding
     private lateinit var dialog: Dialog
     private var selectedDiseaseId: Int? = null
+    private var selectedDiseaseName: String = ""
     private var selectedHospitalId: Int? = null
+    private  var selectedHospitalName: String = ""
+    private  var selectedHospitalContact: String =""
+    private  var selectedHospitalAddress: String = ""
 
 
     override fun onCreateView(
@@ -42,19 +50,17 @@ class DiseaseHospitalFormFragment : Fragment() {
     ): View? {
 
         binding = FragmentDiseasehospitalFormBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(DiseaseHospitalFormViewModel::class.java)
+        viewModel = ViewModelProvider(this, DiseaseHospitalFormViewModelFactory(requireActivity().application))
+            .get(DiseaseHospitalFormViewModel::class.java)
         createDiseaseHospitalObservable()
-        diseaseViewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(DiseaseListViewModel::class.java)
+        diseaseViewModel =
+            ViewModelProvider(this, DiseaseListViewModelFactory(requireActivity().application))
+                .get(DiseaseListViewModel::class.java)
+
 
         hospitalViewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            HospitalListViewModelFactory(requireActivity().application)
         ).get(HospitalListViewModel::class.java)
 
         val autoCompleteDiseaseTextView = binding.autoCompleteDiseaseTextView
@@ -71,13 +77,11 @@ class DiseaseHospitalFormFragment : Fragment() {
                     })
                 autoCompleteDiseaseTextView.setAdapter(adapter)
 
-                // Set an item click listener to get the selected disease and its ID
                 autoCompleteDiseaseTextView.setOnItemClickListener { _, _, position, _ ->
                     val selectedDisease = diseases[position]
                     selectedDiseaseId = selectedDisease?.id
+                    selectedDiseaseName = selectedDisease?.disease_name.toString()
 
-                    // Now you have the selected disease and its ID
-                    // You can use them as needed
                 }
             }
         })
@@ -93,12 +97,12 @@ class DiseaseHospitalFormFragment : Fragment() {
                 autoCompleteHospitalTextView.setOnItemClickListener { _, _, position, _ ->
                     val selectedHospital = hospitals[position]
                     selectedHospitalId = selectedHospital?.id
-                    // Now you have the selected Hospital and its ID
-                    // You can use them as needed
+                    selectedHospitalName = selectedHospital?.hospital_name.toString()
+                    selectedHospitalContact = selectedHospital?.hospital_contact.toString()
+                    selectedHospitalAddress = selectedHospital?.hospital_address.toString()
                 }
             }
         })
-
 
         // Fetch diseases and Hospital data from the ViewModel
         diseaseViewModel.getDiseaseList()
@@ -107,6 +111,7 @@ class DiseaseHospitalFormFragment : Fragment() {
         binding.createDiseaseHospitalBtn.setOnClickListener {
             if (validateForm()) {
                 createDiseaseHospital(0)
+                createDiseaseHospitalRoom(0)    //
             }
         }
 
@@ -135,12 +140,35 @@ class DiseaseHospitalFormFragment : Fragment() {
         }
     }
 
+    private fun createDiseaseHospitalRoom(diseaseHospital_id:Int?){
+            val diseaseHospitalRoom = selectedHospitalId?.let {
+                selectedDiseaseId?.let { it1 ->
+                    DiseaseHospital_Room(
+                        null,
+                        it1,
+                        selectedDiseaseName,
+                        it,
+                        selectedHospitalName,
+                        selectedHospitalContact,
+                        selectedHospitalAddress,
+
+                    )
+                }
+            }
+        Log.i("createddiseasehospitalroom", "{$diseaseHospitalRoom}")
+        if (diseaseHospital_id == 0) {
+            if (diseaseHospitalRoom != null) {
+                viewModel.insertDiseaseHospitalRoomDataIntoRoomDb(diseaseHospitalRoom)
+            }
+        }
+    }
+
 
     private fun createDiseaseHospitalObservable() {
         viewModel.getCreateDiseaseHospitalObservable()
             .observe(viewLifecycleOwner, Observer<Disease_Hospital?> {
                 if (it == null) {
-                    binding.layoutDiseasesName.error = "Disease Hospital Already Exist"
+                    Log.e("error", "error")
                 } else {
                     showSuccessDialog()
 

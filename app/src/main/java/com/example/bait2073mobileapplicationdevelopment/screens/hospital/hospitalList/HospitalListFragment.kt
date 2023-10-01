@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.hospital.hospitalList
 
+import HospitalListViewModelFactory
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -41,8 +42,7 @@ class HospitalListFragment : Fragment(), HospitalListAdapter.HospitalClickListen
     ): View? {
         binding = FragmentHospitalListBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            HospitalListViewModel::class.java)
+            HospitalListViewModelFactory(requireActivity().application)).get(HospitalListViewModel::class.java)
 
         viewModel.getHospitalListObservable().observe(viewLifecycleOwner, Observer<List<Hospital?>> { hospitalListResponse ->
             if(hospitalListResponse == null) {
@@ -182,7 +182,7 @@ class HospitalListFragment : Fragment(), HospitalListAdapter.HospitalClickListen
         }
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
-        dialog.show() // Showing the dialog here
+        dialog.show()
     }
 
 }

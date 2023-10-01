@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.symptom.symptomForm
 
+import SymptomFormViewModelFactory
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -7,6 +8,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -46,10 +48,8 @@ class SymptomFormFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSymptomFormBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(SymptomFormViewModel::class.java)
-        //val user_id = intent.getStringExtra("user_id")
+        viewModel = ViewModelProvider(this, SymptomFormViewModelFactory()).get(SymptomFormViewModel::class.java)
+
         createSymptomObservable()
         val args = SymptomFormFragmentArgs.fromBundle(requireArguments())
         val symptom_id = args.symptomId
@@ -73,9 +73,6 @@ class SymptomFormFragment: Fragment() {
         return binding.root
     }
 
-
-    // Function to show a dialog for choosing between gallery and camera
-
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
@@ -89,11 +86,12 @@ class SymptomFormFragment: Fragment() {
             when (requestCode) {
                 PICK_IMAGE_REQUEST -> {
                     val selectedImageUri = data?.data
-                    if (selectedImageUri != null) {
-
+                    if (isImageValid(selectedImageUri)) {
                         binding.symptomImg.setImageURI(selectedImageUri)
                         val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
                         selectedImageBitmap = imageBitmap // Store the selected image in the variable
+                    }else{
+                        Toast.makeText(requireContext(),"Invalid image format", Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -107,6 +105,20 @@ class SymptomFormFragment: Fragment() {
             }
         }
     }
+
+    private fun isImageValid(imageUri: Uri?): Boolean {
+        if (imageUri == null) {
+            return false
+        }
+        val contentResolver = requireContext().contentResolver
+        val mimeType = contentResolver.getType(imageUri)
+
+        return when (mimeType) {
+            "image/jpeg", "image/jpg", "image/png" -> true
+            else -> false
+        }
+    }
+
     private fun loadSymptomData(symptom_id: Int?) {
         viewModel.getLoadSymptomObservable().observe(viewLifecycleOwner, Observer<Symptom?> {
             if (it != null) {
@@ -161,7 +173,7 @@ class SymptomFormFragment: Fragment() {
     private fun createSymptomObservable() {
         viewModel.getCreateSymptomObservable().observe(viewLifecycleOwner, Observer<Symptom?> {
             if (it == null) {
-                binding.layoutSymptomName.error = "Symptom Name Already Registered, Please Try Another Symptom Name"
+                Log.e("error", "error")
             } else {
                 showSuccessDialog()
 
@@ -192,7 +204,7 @@ class SymptomFormFragment: Fragment() {
         }
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
-        dialog.show() // Showing the dialog here
+        dialog.show()
     }
 
     private fun validSymptomName(symptomNameText: String): String? {
@@ -253,7 +265,7 @@ class SymptomFormFragment: Fragment() {
                 count: Int,
                 after: Int
             ) {
-                // This method is called to notify that the text is about to be changed.
+
             }
             override fun onTextChanged(
                 charSequence: CharSequence?,
@@ -261,7 +273,7 @@ class SymptomFormFragment: Fragment() {
                 before: Int,
                 count: Int
             ) {
-                // This method is called to notify that the text has been changed.
+
                 val symptomNameText = charSequence.toString()
                 val error = validSymptomName(symptomNameText)
 
@@ -274,7 +286,7 @@ class SymptomFormFragment: Fragment() {
             }
 
             override fun afterTextChanged(editable: Editable?) {
-                // This method is called to notify that the text has been changed and processed.
+
             }
         })
     }
@@ -291,7 +303,7 @@ class SymptomFormFragment: Fragment() {
                 count: Int,
                 after: Int
             ) {
-                // This method is called to notify that the text is about to be changed.
+
             }
             override fun onTextChanged(
                 charSequence: CharSequence?,
@@ -299,7 +311,7 @@ class SymptomFormFragment: Fragment() {
                 before: Int,
                 count: Int
             ) {
-                // This method is called to notify that the text has been changed.
+
                 val symptomDescriptionText = charSequence.toString()
                 val error = validSymptomDescription(symptomDescriptionText)
 
@@ -312,7 +324,7 @@ class SymptomFormFragment: Fragment() {
             }
 
             override fun afterTextChanged(editable: Editable?) {
-                // This method is called to notify that the text has been changed and processed.
+
             }
         })
     }

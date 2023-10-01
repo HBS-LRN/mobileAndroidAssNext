@@ -1,5 +1,6 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease
 
+import DiseaseSymptomListViewModelFactory
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -37,9 +38,8 @@ class DiseaseResultFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDiseaseResultBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            DiseaseSymptomListViewModel::class.java)
+        viewModel = ViewModelProvider(this, DiseaseSymptomListViewModelFactory(requireActivity().application)
+        ).get(DiseaseSymptomListViewModel::class.java)
 
         val args = DiseaseResultFragmentArgs.fromBundle(requireArguments())
         val symptom_id = args.symptomId

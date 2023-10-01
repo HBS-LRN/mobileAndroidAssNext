@@ -13,3 +13,4 @@ class EventFormViewModelFactory(private val application: Application) : ViewMode
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+

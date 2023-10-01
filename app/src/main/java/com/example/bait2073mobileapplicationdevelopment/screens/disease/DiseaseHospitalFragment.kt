@@ -1,6 +1,10 @@
 package com.example.bait2073mobileapplicationdevelopment.screens.disease;
 
+import DiseaseHospitalListViewModelFactory
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 
@@ -31,16 +35,17 @@ class DiseaseHospitalFragment  : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDiseaseHospitalBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
-            DiseaseHospitalListViewModel::class.java)
+        viewModel = ViewModelProvider(this, DiseaseHospitalListViewModelFactory(requireActivity().application))
+            .get(DiseaseHospitalListViewModel::class.java)
 
         val args = DiseaseHospitalFragmentArgs.fromBundle(requireArguments())
         val disease_id = args.diseaseId
         Log.i("lol is this disease id","$disease_id")
 
         adapter = DiseaseHospitalAdapter(requireContext())
+        val isNetworkAvailable = isNetworkAvailable(requireContext())
 
+        if(isNetworkAvailable){
         viewModel.getDiseaseHospitalData(disease_id)
         viewModel.getLoadDiseaseHospitalObservable().observe(viewLifecycleOwner, Observer { diseaseHospitals ->
             Log.i("finddaolemaaaaaa","$diseaseHospitals")
@@ -54,6 +59,18 @@ class DiseaseHospitalFragment  : Fragment() {
                 Toast.makeText(requireContext(), "No data found...", Toast.LENGTH_LONG).show()
             }
         })
+        }else {
+            viewModel.diseaseHospitalDataFromRoomDB.observe(viewLifecycleOwner, Observer { roomData ->
+                if (roomData != null && roomData.isNotEmpty()) {
+                    // Update the adapter with RoomDB data
+                    adapter.setRoomData(roomData)
+                    adapter.notifyDataSetChanged()
+                } else {
+                    // Handle the case where RoomDB data is not available
+                    Log.i("roomdbdata", "No RoomDB data found...")
+                }
+            })
+        }
 
         val hospitalRecyclerView = binding.recycleView
         hospitalRecyclerView.setHasFixedSize(true)
@@ -73,5 +90,15 @@ class DiseaseHospitalFragment  : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getDiseaseHospitalList()
     }
+
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
 
 }
